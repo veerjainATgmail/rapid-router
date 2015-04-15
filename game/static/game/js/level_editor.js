@@ -41,7 +41,7 @@ ocargo.LevelEditor = function() {
     var decor = [];
     var trafficLights = [];
     var originNode = null;
-    var destinationNode = null;
+    var destinationNodes = [];
     var currentTheme = THEMES.grass;
 
     // Reference to the Raphael elements for each square
@@ -930,7 +930,13 @@ ocargo.LevelEditor = function() {
     }
 
     function isDestinationCoordinate(coordinate) {
-        return destinationNode && destinationNode.coordinate.equals(coordinate);
+        for (var i = 0; i < destinationNodes.length; i++) {
+            if (destinationNodes[i].coordinate.equals(coordinate)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     function isCoordinateOnGrid(coordinate) {
@@ -987,7 +993,7 @@ ocargo.LevelEditor = function() {
         nodes = [];
         strikeStart = null;
         originNode = null;
-        destinationNode = null;
+        destinationNodes = [];
     }
 
     function drawAll() {
@@ -1055,8 +1061,9 @@ ocargo.LevelEditor = function() {
         if (originNode) {
             markAsOrigin(originNode.coordinate);
         }
-        if (destinationNode) {
-            markAsDestination(destinationNode.coordinate);
+
+        for (var i = 0; i < destinationNodes.length; i++) {
+            markAsDestination(destinationNodes[i].coordinate);
         }
 
         bringTrafficLightsToFront();
@@ -1135,8 +1142,11 @@ ocargo.LevelEditor = function() {
                     markAsBackground(prevStart);
                 }
                 // Check if same as destination node
-                if (isDestinationCoordinate(coordMap)) {
-                    destinationNode = null;
+                for (var i = 0; i < destinationNodes.length; i++) {
+                    if (destinationNodes[i].coordinate.equals(coordMap)) {
+                        destinationNodes.splice(i, 1);
+                        break;
+                    }
                 }
                 markAsOrigin(coordMap);
                 var newStartIndex = ocargo.Node.findNodeIndexByCoordinate(coordMap, nodes);
@@ -1146,18 +1156,27 @@ ocargo.LevelEditor = function() {
                 nodes[newStartIndex] = nodes[0];
                 nodes[0] = temp;
                 originNode = nodes[0];
-            } else if (mode === modes.MARK_DESTINATION_MODE && existingNode) {    
-                if (destinationNode) {
-                    var prevEnd = destinationNode.coordinate;
-                    markAsBackground(prevEnd);
-                }
+            } else if (mode === modes.MARK_DESTINATION_MODE && existingNode) {
                 // Check if same as starting node
                 if (isOriginCoordinate(coordMap)) {
                     originNode = null;
                 }
                 markAsDestination(coordMap);
                 var newEnd = ocargo.Node.findNodeIndexByCoordinate(coordMap, nodes);
-                destinationNode = nodes[newEnd];
+
+                var removedExisting = false;
+                for (var i = 0; i < destinationNodes.length; i++) {
+                    if (destinationNodes[i].coordinate.equals(coordMap)) {
+                        markAsBackground(coordMap);
+                        destinationNodes.splice(i, 1);
+                        removedExisting = true;
+                        break;
+                    }
+                }
+
+                if (!removedExisting) {
+                    destinationNodes.push(nodes[newEnd]);
+                }
 
             }  else if (mode === modes.ADD_ROAD_MODE || mode === modes.DELETE_ROAD_MODE) {
                 strikeStart = coordMap;
@@ -1186,7 +1205,7 @@ ocargo.LevelEditor = function() {
                 }
             } else if (mode === modes.MARK_ORIGIN_MODE || mode === modes.MARK_DESTINATION_MODE) {
                 var node = ocargo.Node.findNodeByCoordinate(coordMap, nodes);
-                if (node && destinationNode !== node && originNode !== node) {
+                if (node && !isOriginCoordinate(coordMap) && !isDestinationCoordinate(coordMap)) {
                     if (mode === modes.MARK_DESTINATION_MODE) {
                         mark(coordMap, 'blue', 0.3, true); 
                     } else if (canPlaceCFC(node)) {
@@ -1207,7 +1226,7 @@ ocargo.LevelEditor = function() {
 
             if (mode === modes.MARK_ORIGIN_MODE || mode === modes.MARK_DESTINATION_MODE) {
                 var node = ocargo.Node.findNodeByCoordinate(coordMap, nodes);
-                if (node && destinationNode !== node && originNode !== node) {
+                if (node && !isOriginCoordinate(coordMap) && !isDestinationCoordinate(coordMap)) {
                     markAsBackground(coordMap);
                 }
             } else if (mode === modes.ADD_ROAD_MODE || mode === modes.DELETE_ROAD_MODE) {
@@ -1404,8 +1423,8 @@ ocargo.LevelEditor = function() {
             if (originNode) {
                 markAsOrigin(originNode.coordinate);
             }
-            if (destinationNode) {
-                markAsDestination(destinationNode.coordinate);
+            for (var i = 0; i < destinationNodes.length; i++) {
+                markAsDestination(destinationNodes[i].coordinate);
             }
 
             // Now calculate the source coordinate
@@ -1518,8 +1537,8 @@ ocargo.LevelEditor = function() {
             if (originNode) {
                 markAsOrigin(originNode.coordinate);
             }
-            if (destinationNode) {
-                markAsDestination(destinationNode.coordinate);
+            for (var i = 0; i < destinationNodes.length; i++) {
+                markAsDestination(destinationNode[i].coordinate);
             }
 
             if(trashcanOpen) {
@@ -1618,9 +1637,12 @@ ocargo.LevelEditor = function() {
                     markAsBackground(originNode.coordinate);
                     originNode = null;
                 }
-                if (isDestinationCoordinate(coord)) {
-                    markAsBackground(destinationNode.coordinate);
-                    destinationNode = null;
+                for (var i = 0; i < destinationNodes.length; i++) {
+                    if (destinationNodes[i].coordinate.equals(coord)) {
+                        markAsBackground(coord);
+                        destinationNodes.splice(i, 1);
+                        break;
+                    }
                 }
 
                 //  Check if any traffic lights present
@@ -1808,10 +1830,13 @@ ocargo.LevelEditor = function() {
         }
 
         // Destination and origin data
-        if (destinationNode) {
-            var destinationCoord = destinationNode.coordinate;
-            state.destinations = JSON.stringify([[destinationCoord.x, destinationCoord.y]]);
+        var destinations = [];
+        for (i = 0; i < destinationNodes.length; i++) {
+            var coordinate = destinationNodes[i].coordinate;
+            destinations.push([coordinate.x, coordinate.y]);
         }
+        state.destinations = JSON.stringify(destinations);
+
         if (originNode) {
             var originCoord = originNode.coordinate;
             var nextCoord = originNode.connectedNodes[0].coordinate;
@@ -1854,11 +1879,14 @@ ocargo.LevelEditor = function() {
         }
 
         // Load in destination and origin nodes
-        // TODO needs to be fixed in the long term with multiple destinations
         if (state.destinations) {
-            var destination = JSON.parse(state.destinations)[0];
-            var destinationCoordinate = new ocargo.Coordinate(destination[0], destination[1]);
-            destinationNode = ocargo.Node.findNodeByCoordinate(destinationCoordinate, nodes);
+            var destinations = JSON.parse(state.destinations);
+            for (var i = 0; i < destinations.length; i++) {
+                var destination = destinations[i];
+                var destinationCoordinate = new ocargo.Coordinate(destination[0], destination[1]);
+                var node = ocargo.Node.findNodeByCoordinate(destinationCoordinate, nodes);
+                destinationNodes.push(node);
+            }
         }
 
         if (state.origin) {
@@ -1999,7 +2027,7 @@ ocargo.LevelEditor = function() {
 
     function isLevelValid() {
         // Check to see if start and end nodes have been marked
-        if (!originNode || !destinationNode) {
+        if (!originNode || !destinationNodes.length) {
              ocargo.Drawing.startPopup(ocargo.messages.ohNo,
                                        ocargo.messages.noStartOrEndSubtitle,
                                        ocargo.messages.noStartOrEnd + ocargo.jsElements.closebutton("Close"));
@@ -2007,12 +2035,17 @@ ocargo.LevelEditor = function() {
         }
 
         // Check to see if path exists from start to end
-        var destination = new ocargo.Destination(0, destinationNode);
-        var pathToDestination = getOptimalPath(nodes, [destination]);
-        if (!pathToDestination) {
+        var destinations = [];
+        for (var i = 0; i < destinationNodes.length; i++) {
+            var destination = new ocargo.Destination(i, destinationNodes[i]);
+            destinations.push(destination);
+        }
+
+        var pathToDestinations = getOptimalPath(nodes, destinations);
+        if (!pathToDestinations) {
             ocargo.Drawing.startPopup(ocargo.messages.somethingWrong,
-                                      ocargo.messages.noStartEndRouteSubtitle,
-                                      ocargo.messages.noStartEndRoute + ocargo.jsElements.closebutton("Close"));
+                ocargo.messages.noStartEndRouteSubtitle,
+                ocargo.messages.noStartEndRoute + ocargo.jsElements.closebutton("Close"));
             return false;
         }
 
