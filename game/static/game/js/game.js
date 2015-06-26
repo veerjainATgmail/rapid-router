@@ -66,6 +66,9 @@ ocargo.Game.prototype.setup = function() {
     }
     ocargo.Drawing.startPopup(title, LESSON,
          loggedOutWarning, true, ocargo.button.getDismissButtonHtml('Play'));
+
+    var result = JSON.stringify({"tag":"preGameMessage", "title":title, "context":LESSON});
+    window.webkit.messageHandlers.handler.postMessage(result);
 };
 
 ocargo.Game.prototype.reset = function() {
