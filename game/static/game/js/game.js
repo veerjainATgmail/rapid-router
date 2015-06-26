@@ -219,6 +219,9 @@ ocargo.Game.prototype.setupDirectDriveListeners = function() {
             ocargo.blocklyControl.addBlockToEndOfProgram('move_forwards');
             ocargo.drawing.moveForward(
                 0, ANIMATION_LENGTH, function() {ocargo.game.onStopControls();});
+
+            var result = JSON.stringify({"tag":"moveForward", "content":[]});
+            window.webkit.messageHandlers.handler.postMessage(result);
         }
     });
     $('#turnLeft').click(function() {
@@ -227,6 +230,9 @@ ocargo.Game.prototype.setupDirectDriveListeners = function() {
             ocargo.blocklyControl.addBlockToEndOfProgram('turn_left');
             ocargo.drawing.moveLeft(
                 0, ANIMATION_LENGTH, function() {ocargo.game.onStopControls();});
+
+            var result = JSON.stringify({"tag":"turnLeft", "content":[]});
+            window.webkit.messageHandlers.handler.postMessage(result);
         }
     });
     $('#turnRight').click(function() {
@@ -235,6 +241,9 @@ ocargo.Game.prototype.setupDirectDriveListeners = function() {
             ocargo.blocklyControl.addBlockToEndOfProgram('turn_right');
             ocargo.drawing.moveRight(
                 0, ANIMATION_LENGTH, function() {ocargo.game.onStopControls();});
+
+            var result = JSON.stringify({"tag":"turnRight", "content":[]});
+            window.webkit.messageHandlers.handler.postMessage(result);
         }
     });
     $('#go').click(function() {

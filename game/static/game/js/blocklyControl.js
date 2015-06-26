@@ -55,6 +55,9 @@ ocargo.BlocklyControl.prototype.reset = function() {
         var startBlock = this.createBlock('start');
         startBlock.moveBy(30+(i%2)*200,30+Math.floor(i/2)*100);
     }
+
+    var result = JSON.stringify({"tag":"blocklyReset", "content":[]});
+    window.webkit.messageHandlers.handler.postMessage(result);
 };
 
 ocargo.BlocklyControl.prototype.toggleFlyout = function() {
