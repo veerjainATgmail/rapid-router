@@ -672,7 +672,10 @@ ocargo.Game.prototype.setupTabs = function() {
     function setupHelpTab() {
         tabs.help.setOnChange(function() {
             ocargo.game.currentTabSelected.select();
-            ocargo.Drawing.startPopup('', '', HINT);
+            //ocargo.Drawing.startPopup('', '', HINT);
+
+            var result = JSON.stringify({"tag":"help", "message":HINT});
+            window.webkit.messageHandlers.handler.postMessage(result);
         });
     }
 
@@ -701,6 +704,9 @@ ocargo.Game.prototype.setupTabs = function() {
         tabs.mute.setOnChange(function() {
             ocargo.game.mute($.cookie('muted') !== 'true');
             ocargo.game.currentTabSelected.select();
+
+            var result = JSON.stringify({"tag":"mute", "content":[]});
+            window.webkit.messageHandlers.handler.postMessage(result);
         });
     }
 
@@ -753,6 +759,9 @@ ocargo.Game.prototype.onPlayControls = function() {
     // ocargo.game.tabs.big_code_mode.setEnabled(false);
     // ocargo.game.tabs.print.setEnabled(false);
     ocargo.game.tabs.help.setEnabled(false);
+
+    var result = JSON.stringify({"tag":"onPlayControls", "content":[]});
+    window.webkit.messageHandlers.handler.postMessage(result);
 };
 
 ocargo.Game.prototype.onStepControls = function() {
@@ -786,16 +795,25 @@ ocargo.Game.prototype.onStopControls = function() {
     // ocargo.game.tabs.big_code_mode.setEnabled(true);
     // ocargo.game.tabs.print.setEnabled(true);
     ocargo.game.tabs.help.setEnabled(true);
+
+    var result = JSON.stringify({"tag":"onStopControls", "content":[]});
+    window.webkit.messageHandlers.handler.postMessage(result);
 };
 
 ocargo.Game.prototype.onPauseControls = function() {
     ocargo.game.tabs.play.setContents(ocargo.Drawing.imageDir + 'icons/play.svg', 'Resume');
     ocargo.game.tabs.step.setEnabled(true);
+
+    var result = JSON.stringify({"tag":"onPauseControls", "content":[]});
+    window.webkit.messageHandlers.handler.postMessage(result);
 };
 
 ocargo.Game.prototype.onResumeControls = function() {
     ocargo.game.tabs.play.setContents(ocargo.Drawing.imageDir + 'icons/pause.svg', 'Pause');
     ocargo.game.tabs.step.setEnabled(false);
+
+    var result = JSON.stringify({"tag":"onResumeControls", "content":[]});
+    window.webkit.messageHandlers.handler.postMessage(result);
 };
 
 ocargo.Game.prototype.mute = function(mute) {
