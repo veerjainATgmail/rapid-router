@@ -424,6 +424,9 @@ ocargo.Game.prototype.setupTabs = function() {
         tabs.clear_program.setOnChange(function() {
             if (ocargo.game.currentTabSelected == tabs.blockly) {
                 ocargo.blocklyControl.reset();
+
+                var result = JSON.stringify({"tag":"blocklyReset", "content":[]});
+                window.webkit.messageHandlers.handler.postMessage(result);
             }
             if (ocargo.game.currentTabSelected == tabs.python) {
                 ocargo.pythonControl.reset();

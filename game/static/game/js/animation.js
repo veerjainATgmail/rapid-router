@@ -276,6 +276,8 @@ ocargo.Animation.prototype.performAnimation = function(a) {
 				otherMsg = '<div id="hintBtnPara">' + '</div><div id="hintText">' + HINT + '</div>';
 			}
 			ocargo.Drawing.startPopup(title, leadMsg, otherMsg, true, buttons);
+			var result = JSON.stringify({"tag":"error"});
+			window.webkit.messageHandlers.handler.postMessage(result);
 			if (a.popupHint) {
 				$("#hintPopupBtn").click( function(){
 	                    $("#hintText").show(500);

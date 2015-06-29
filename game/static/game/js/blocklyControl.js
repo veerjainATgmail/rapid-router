@@ -56,8 +56,6 @@ ocargo.BlocklyControl.prototype.reset = function() {
         startBlock.moveBy(30+(i%2)*200,30+Math.floor(i/2)*100);
     }
 
-    var result = JSON.stringify({"tag":"blocklyReset", "content":[]});
-    window.webkit.messageHandlers.handler.postMessage(result);
 };
 
 ocargo.BlocklyControl.prototype.toggleFlyout = function() {
@@ -348,7 +346,7 @@ ocargo.BlocklyControl.prototype.highlightIncorrectBlock = function(incorrectBloc
 
     this.incorrectBlock = incorrectBlock;
     this.incorrectBlockColour = incorrectBlock.getColour();
-
+cd
     incorrectBlock.setColour(0);
     for (var i = 0; i < repeats; i++) {
         window.setTimeout(function() {blocklyControl.setBlockSelected(incorrectBlock, true);},
