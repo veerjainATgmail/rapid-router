@@ -224,6 +224,8 @@ ocargo.Animation.prototype.performAnimation = function(a) {
 			var leadMsg = a.popupMessage;
 			var buttons = a.button;
 
+			var result;
+
 			// sort popup...
 			switch (a.popupType) {
 				case 'WIN':
@@ -233,12 +235,15 @@ ocargo.Animation.prototype.performAnimation = function(a) {
 					if (BLOCKLY_ENABLED && PYTHON_ENABLED && ocargo.game.currentTabSelected == ocargo.game.tabs.blockly) {
 						levelMsg = ocargo.messages.nowTryPython;
 						buttons += ocargo.button.addDismissButtonHtml('Close');
+						result = JSON.stringify({"tag":"win", "title":title, "leadMsg":leadMsg,  "buttons":"Close"});
 					}
 					else {
 						// If there exists next level, add a button which redirects the user to that
 						if (NEXT_LEVEL) {
 							buttons += ocargo.button.getRedirectButtonHtml("'/rapidrouter/" + NEXT_LEVEL + "/'",
 					        								     		'Next Level');
+
+							result = JSON.stringify({"tag":"winWithNextLevel", "title":title, "leadMsg":leadMsg,  "buttons":"Next Level"});
 					    } 
 					    else {
 							/*
@@ -252,6 +257,7 @@ ocargo.Animation.prototype.performAnimation = function(a) {
 					        if (NEXT_EPISODE) {
 					            levelMsg = '<br><br>' + ocargo.messages.nextEpisode(NEXT_EPISODE, RANDOM);
 								buttons += ocargo.jsElements.nextEpisodeButton(NEXT_EPISODE, RANDOM);
+								result = JSON.stringify({"tag":"winWithNextLevel", "title":title, "leadMsg":leadMsg,  "buttons":"Next Episode"});
 					        }
 					        else if(DEFAULT_LEVEL) {
 					            levelMsg = ocargo.messages.lastLevel;
@@ -265,6 +271,7 @@ ocargo.Animation.prototype.performAnimation = function(a) {
 				case 'FAIL':
 					title = ocargo.messages.failTitle;
 					buttons = ocargo.button.getTryAgainButtonHtml();
+					result = JSON.stringify({"tag":"fail", "title":title, "leadMsg":leadMsg,  "buttons":"Try Again"});
 					break;
 				case 'WARNING':
 					buttons = ocargo.button.getTryAgainButtonHtml();
@@ -275,8 +282,7 @@ ocargo.Animation.prototype.performAnimation = function(a) {
 				buttons += '<button class="navigation_button long_button" id="hintPopupBtn"><span>' + ocargo.messages.needHint + '</span></button>';
 				otherMsg = '<div id="hintBtnPara">' + '</div><div id="hintText">' + HINT + '</div>';
 			}
-			ocargo.Drawing.startPopup(title, leadMsg, otherMsg, true, buttons);
-			var result = JSON.stringify({"tag":"error"});
+			//ocargo.Drawing.startPopup(title, leadMsg, otherMsg, true, buttons);
 			try {
 				webkit.messageHandlers.handler.postMessage(result);
 			} catch(err) {

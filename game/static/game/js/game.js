@@ -64,10 +64,10 @@ ocargo.Game.prototype.setup = function() {
             title = LEVEL_NAME;
         }
     }
-    ocargo.Drawing.startPopup(title, LESSON,
-         loggedOutWarning, true, ocargo.button.getDismissButtonHtml('Play'));
+    //ocargo.Drawing.startPopup(title, LESSON,
+    //     loggedOutWarning, true, ocargo.button.getDismissButtonHtml('Play'));
 
-    var result = JSON.stringify({"tag":"preGameMessage", "title":title, "context":LESSON});
+    var result = JSON.stringify({"tag":"preGameMessage", "title":title, "context":LESSON, "buttons":"Play"});
     try {
         webkit.messageHandlers.handler.postMessage(result);
     } catch(err) {
@@ -440,18 +440,12 @@ ocargo.Game.prototype.setupTabs = function() {
         tabs.clear_program.setOnChange(function() {
             if (ocargo.game.currentTabSelected == tabs.blockly) {
                 ocargo.blocklyControl.reset();
-
-                var result = JSON.stringify({"tag":"blocklyReset", "content":[]});
-                try {
-                    webkit.messageHandlers.handler.postMessage(result);
-                } catch(err) {
-                    console.log('The native context does not exist yet');
-                }
             }
             if (ocargo.game.currentTabSelected == tabs.python) {
                 ocargo.pythonControl.reset();
             }
             ocargo.game.reset();
+
 
             ocargo.game.currentTabSelected.select();
         });
