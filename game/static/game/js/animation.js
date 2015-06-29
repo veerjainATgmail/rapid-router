@@ -277,7 +277,11 @@ ocargo.Animation.prototype.performAnimation = function(a) {
 			}
 			ocargo.Drawing.startPopup(title, leadMsg, otherMsg, true, buttons);
 			var result = JSON.stringify({"tag":"error"});
-			window.webkit.messageHandlers.handler.postMessage(result);
+			try {
+				webkit.messageHandlers.handler.postMessage(result);
+			} catch(err) {
+				console.log('The native context does not exist yet');
+			}
 			if (a.popupHint) {
 				$("#hintPopupBtn").click( function(){
 	                    $("#hintText").show(500);

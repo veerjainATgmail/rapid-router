@@ -68,7 +68,11 @@ ocargo.Game.prototype.setup = function() {
          loggedOutWarning, true, ocargo.button.getDismissButtonHtml('Play'));
 
     var result = JSON.stringify({"tag":"preGameMessage", "title":title, "context":LESSON});
-    window.webkit.messageHandlers.handler.postMessage(result);
+    try {
+        webkit.messageHandlers.handler.postMessage(result);
+    } catch(err) {
+        console.log('The native context does not exist yet');
+    }
 };
 
 ocargo.Game.prototype.reset = function() {
@@ -85,11 +89,11 @@ ocargo.Game.prototype.reset = function() {
 ocargo.Game.prototype.runProgramAndPrepareAnimation = function() {
     this.reset();
 
-    ocargo.event.sendEvent("PlayButtonPressed", { levelName: LEVEL_NAME,
-                                                  defaultLevel: DEFAULT_LEVEL,
-                                                  workspace: ocargo.blocklyControl.serialize(),
-                                                  failures: this.failures,
-                                                  pythonWorkspace: ocargo.pythonControl.getCode() });
+    //ocargo.event.sendEvent("PlayButtonPressed", { levelName: LEVEL_NAME,
+    //                                              defaultLevel: DEFAULT_LEVEL,
+    //                                              workspace: ocargo.blocklyControl.serialize(),
+    //                                              failures: this.failures,
+    //                                              pythonWorkspace: ocargo.pythonControl.getCode() });
 
     var result = ocargo.controller.prepare();
     if (!result.success) {
@@ -224,7 +228,11 @@ ocargo.Game.prototype.setupDirectDriveListeners = function() {
                 0, ANIMATION_LENGTH, function() {ocargo.game.onStopControls();});
 
             var result = JSON.stringify({"tag":"moveForward", "content":[]});
-            window.webkit.messageHandlers.handler.postMessage(result);
+            try {
+                webkit.messageHandlers.handler.postMessage(result);
+            } catch(err) {
+                console.log('The native context does not exist yet');
+            }
         }
     });
     $('#turnLeft').click(function() {
@@ -235,7 +243,11 @@ ocargo.Game.prototype.setupDirectDriveListeners = function() {
                 0, ANIMATION_LENGTH, function() {ocargo.game.onStopControls();});
 
             var result = JSON.stringify({"tag":"turnLeft", "content":[]});
-            window.webkit.messageHandlers.handler.postMessage(result);
+            try {
+                webkit.messageHandlers.handler.postMessage(result);
+            } catch(err) {
+                console.log('The native context does not exist yet');
+            }
         }
     });
     $('#turnRight').click(function() {
@@ -246,7 +258,11 @@ ocargo.Game.prototype.setupDirectDriveListeners = function() {
                 0, ANIMATION_LENGTH, function() {ocargo.game.onStopControls();});
 
             var result = JSON.stringify({"tag":"turnRight", "content":[]});
-            window.webkit.messageHandlers.handler.postMessage(result);
+            try {
+                webkit.messageHandlers.handler.postMessage(result);
+            } catch(err) {
+                console.log('The native context does not exist yet');
+            }
         }
     });
     $('#go').click(function() {
@@ -426,7 +442,11 @@ ocargo.Game.prototype.setupTabs = function() {
                 ocargo.blocklyControl.reset();
 
                 var result = JSON.stringify({"tag":"blocklyReset", "content":[]});
-                window.webkit.messageHandlers.handler.postMessage(result);
+                try {
+                    webkit.messageHandlers.handler.postMessage(result);
+                } catch(err) {
+                    console.log('The native context does not exist yet');
+                }
             }
             if (ocargo.game.currentTabSelected == tabs.python) {
                 ocargo.pythonControl.reset();
@@ -681,7 +701,11 @@ ocargo.Game.prototype.setupTabs = function() {
             //ocargo.Drawing.startPopup('', '', HINT);
 
             var result = JSON.stringify({"tag":"help", "message":HINT});
-            window.webkit.messageHandlers.handler.postMessage(result);
+            try {
+                webkit.messageHandlers.handler.postMessage(result);
+            } catch(err) {
+                console.log('The native context does not exist yet');
+            }
         });
     }
 
@@ -712,7 +736,11 @@ ocargo.Game.prototype.setupTabs = function() {
             ocargo.game.currentTabSelected.select();
 
             var result = JSON.stringify({"tag":"mute", "content":[]});
-            window.webkit.messageHandlers.handler.postMessage(result);
+            try {
+                webkit.messageHandlers.handler.postMessage(result);
+            } catch(err) {
+                console.log('The native context does not exist yet');
+            }
         });
     }
 
@@ -767,7 +795,11 @@ ocargo.Game.prototype.onPlayControls = function() {
     ocargo.game.tabs.help.setEnabled(false);
 
     var result = JSON.stringify({"tag":"onPlayControls", "content":[]});
-    window.webkit.messageHandlers.handler.postMessage(result);
+    try {
+        webkit.messageHandlers.handler.postMessage(result);
+    } catch(err) {
+        console.log('The native context does not exist yet');
+    }
 };
 
 ocargo.Game.prototype.onStepControls = function() {
@@ -803,7 +835,11 @@ ocargo.Game.prototype.onStopControls = function() {
     ocargo.game.tabs.help.setEnabled(true);
 
     var result = JSON.stringify({"tag":"onStopControls", "content":[]});
-    window.webkit.messageHandlers.handler.postMessage(result);
+    try {
+        webkit.messageHandlers.handler.postMessage(result);
+    } catch(err) {
+        console.log('The native context does not exist yet');
+    }
 };
 
 ocargo.Game.prototype.onPauseControls = function() {
@@ -811,7 +847,11 @@ ocargo.Game.prototype.onPauseControls = function() {
     ocargo.game.tabs.step.setEnabled(true);
 
     var result = JSON.stringify({"tag":"onPauseControls", "content":[]});
-    window.webkit.messageHandlers.handler.postMessage(result);
+    try {
+        webkit.messageHandlers.handler.postMessage(result);
+    } catch(err) {
+        console.log('The native context does not exist yet');
+    }
 };
 
 ocargo.Game.prototype.onResumeControls = function() {
@@ -819,7 +859,11 @@ ocargo.Game.prototype.onResumeControls = function() {
     ocargo.game.tabs.step.setEnabled(false);
 
     var result = JSON.stringify({"tag":"onResumeControls", "content":[]});
-    window.webkit.messageHandlers.handler.postMessage(result);
+    try {
+        webkit.messageHandlers.handler.postMessage(result);
+    } catch(err) {
+        console.log('The native context does not exist yet');
+    }
 };
 
 ocargo.Game.prototype.mute = function(mute) {

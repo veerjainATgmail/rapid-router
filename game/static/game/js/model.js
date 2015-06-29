@@ -153,11 +153,11 @@ ocargo.Model.prototype.moveVan = function(nextNode, action) {
             description: 'crash popup'
         });
 
-        ocargo.event.sendEvent("LevelCrash", { levelName: LEVEL_NAME,
-                                               defaultLevel: DEFAULT_LEVEL,
-                                               workspace: ocargo.blocklyControl.serialize(),
-                                               failures: this.failures,
-                                               pythonWorkspace: ocargo.pythonControl.getCode() });
+        //ocargo.event.sendEvent("LevelCrash", { levelName: LEVEL_NAME,
+        //                                       defaultLevel: DEFAULT_LEVEL,
+        //                                       workspace: ocargo.blocklyControl.serialize(),
+        //                                       failures: this.failures,
+        //                                       pythonWorkspace: ocargo.pythonControl.getCode() });
 
         this.reasonForTermination = 'CRASH';
         return false;
@@ -165,11 +165,11 @@ ocargo.Model.prototype.moveVan = function(nextNode, action) {
 
     if (this.van.fuel < 0) {
         // Van ran out of fuel last step
-        ocargo.event.sendEvent("LevelRunOutOfFuel", { levelName: LEVEL_NAME,
-                                                      defaultLevel: DEFAULT_LEVEL,
-                                                      workspace: ocargo.blocklyControl.serialize(),
-                                                      failures: this.failures,
-                                                      pythonWorkspace: ocargo.pythonControl.getCode() });
+        //ocargo.event.sendEvent("LevelRunOutOfFuel", { levelName: LEVEL_NAME,
+        //                                              defaultLevel: DEFAULT_LEVEL,
+        //                                              workspace: ocargo.blocklyControl.serialize(),
+        //                                              failures: this.failures,
+        //                                              pythonWorkspace: ocargo.pythonControl.getCode() });
 
         ocargo.animation.appendAnimation({
             type: 'popup',
@@ -200,11 +200,11 @@ ocargo.Model.prototype.moveVan = function(nextNode, action) {
     var light = this.getTrafficLightForNode(this.van.getPosition());
     if (light !== null && light.getState() === ocargo.TrafficLight.RED && nextNode !== light.controlledNode) {
         // Ran a red light
-        ocargo.event.sendEvent("LevelThroughRedLight", { levelName: LEVEL_NAME,
-                                                         defaultLevel: DEFAULT_LEVEL,
-                                                         workspace: ocargo.blocklyControl.serialize(),
-                                                         failures: this.failures,
-                                                         pythonWorkspace: ocargo.pythonControl.getCode() });
+        //ocargo.event.sendEvent("LevelThroughRedLight", { levelName: LEVEL_NAME,
+        //                                                 defaultLevel: DEFAULT_LEVEL,
+        //                                                 workspace: ocargo.blocklyControl.serialize(),
+        //                                                 failures: this.failures,
+        //                                                 pythonWorkspace: ocargo.pythonControl.getCode() });
 
         ocargo.animation.appendAnimation({
             type: 'popup',
