@@ -798,6 +798,11 @@ ocargo.Game.prototype.onStepControls = function() {
     // ocargo.game.tabs.big_code_mode.setEnabled(false);
     // ocargo.game.tabs.print.setEnabled(false);
     ocargo.game.tabs.help.setEnabled(false);
+    if (getURLParameter('mode') == 'ios') {
+        var result = JSON.stringify({"tag":"onStepControls", "content":[]});
+        webkit.messageHandlers.handler.postMessage(result);
+    }
+
 };
 
 ocargo.Game.prototype.onStopControls = function() {
