@@ -351,7 +351,7 @@ ocargo.BlocklyControl.prototype.highlightIncorrectBlock = function(incorrectBloc
 
     this.incorrectBlock = incorrectBlock;
     this.incorrectBlockColour = incorrectBlock.getColour();
-cd
+
     incorrectBlock.setColour(0);
     for (var i = 0; i < repeats; i++) {
         window.setTimeout(function() {blocklyControl.setBlockSelected(incorrectBlock, true);},
