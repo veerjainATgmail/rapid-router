@@ -56,11 +56,9 @@ ocargo.BlocklyControl.prototype.reset = function() {
         startBlock.moveBy(30+(i%2)*200,30+Math.floor(i/2)*100);
     }
 
-    var result = JSON.stringify({"tag":"blocklyReset", "content":[]});
-    try {
+    if (getURLParameter('mode') == 'ios') {
+        var result = JSON.stringify({"tag":"blocklyReset", "content":[]});
         webkit.messageHandlers.handler.postMessage(result);
-    } catch(err) {
-        console.log('The native context does not exist yet');
     }
 
 };

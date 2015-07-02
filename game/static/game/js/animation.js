@@ -282,11 +282,10 @@ ocargo.Animation.prototype.performAnimation = function(a) {
 				buttons += '<button class="navigation_button long_button" id="hintPopupBtn"><span>' + ocargo.messages.needHint + '</span></button>';
 				otherMsg = '<div id="hintBtnPara">' + '</div><div id="hintText">' + HINT + '</div>';
 			}
-			//ocargo.Drawing.startPopup(title, leadMsg, otherMsg, true, buttons);
-			try {
+			if (getURLParameter('mode') == 'ios') {
 				webkit.messageHandlers.handler.postMessage(result);
-			} catch(err) {
-				console.log('The native context does not exist yet');
+			} else {
+				ocargo.Drawing.startPopup(title, leadMsg, otherMsg, true, buttons);
 			}
 			if (a.popupHint) {
 				$("#hintPopupBtn").click( function(){
