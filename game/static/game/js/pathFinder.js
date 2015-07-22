@@ -6,106 +6,93 @@ ocargo.PathFinder = function(model) {
     this.van = model.van;
     this.nodes = model.map.nodes;
     this.destinations = model.map.destinations;
-    
+
     this.pathScoreDisabled = DISABLE_ROUTE_SCORE;
-    this.maxDistanceScore = DISABLE_ROUTE_SCORE ? 0 : 10;
+    this.modelSolution = MODEL_SOLUTION;
 
-    this.modelLength = MODEL_SOLUTION;
-    this.maxInstrLengthScore = (this.modelLength.length === 0 ? 0 : 10);
+    this.maxScoreForPathLength = 10;
+    this.maxScoreForNumberOfInstructions = 10;
 
-    this.maxScore = this.maxDistanceScore + this.maxInstrLengthScore;
-    
+    this.maxScore = this.maxScoreForPathLength + this.maxScoreForNumberOfInstructions;
+
     this.optimalPath = getOptimalPath(this.nodes, this.destinations);
 };
 
 ocargo.PathFinder.prototype.getScore = function() {
-    var message = "";
+    var routeCoins = {};
+    var instrCoins = {};
+    var performance= "";
+
     var pathLengthScore = 0;
     if(!this.pathScoreDisabled){
         pathLengthScore = Math.max(0, this.getTravelledPathScore());
-        message = ocargo.messages.pathScore + 
-                    this.renderCoins(pathLengthScore, this.maxDistanceScore);
+        routeCoins = this.getNumCoins(pathLengthScore, this.maxScoreForPathLength);
     }
 
     var totalScore = pathLengthScore;
 
-    if (this.modelLength.length > 0) {
+    if (this.modelSolution.length > 0) {
         // Then we're on a default level
-        var initInstrScore = this.getInstrLengthScore();
+        var initInstrScore = this.getScoreForNumberOfInstructions();
         var instrScore = Math.max(0, initInstrScore);
 
-        if (initInstrScore >= 2 * this.maxInstrLengthScore) {
+        if (initInstrScore >= 2 * this.maxScoreForNumberOfInstructions) {
             instrScore = 0;
-        } else if (initInstrScore > this.maxInstrLengthScore) {
-            instrScore = this.maxInstrLengthScore - initInstrScore % this.maxInstrLengthScore;
+        } else if (initInstrScore > this.maxScoreForNumberOfInstructions) {
+            instrScore = this.maxScoreForNumberOfInstructions - initInstrScore % this.maxScoreForNumberOfInstructions;
         }
         instrScore = Math.max(0, instrScore);
 
-        message +=  ocargo.messages.algorithmScore +
-                    this.renderCoins(instrScore, this.maxInstrLengthScore) + "<br>";
         totalScore += instrScore;
+        instrCoins = this.getNumCoins(instrScore, this.maxScoreForNumberOfInstructions);
     }
 
 
-    message += ocargo.messages.totalScore(totalScore, this.maxScore);
-
-    if (pathLengthScore < this.maxDistanceScore) {
-        message += "<br>" + ocargo.messages.pathLonger;
+    if (pathLengthScore < this.maxScoreForPathLength) {
+        performance = "pathLonger";
     }
-    else if (initInstrScore > this.maxInstrLengthScore) {
-        message += "<br>" + ocargo.messages.algorithmShorter;
+    else if (initInstrScore > this.maxScoreForNumberOfInstructions) {
+        performance = "algorithmShorter";
     }
-    else if (initInstrScore < this.maxInstrLengthScore) {
-        message += "<br>" + ocargo.messages.algorithmLonger;
+    else if (initInstrScore < this.maxScoreForNumberOfInstructions) {
+        performance = "algorithmLonger";
     }
     else  if (totalScore === this.maxScore) {
-        message += "<br>" + ocargo.messages.scorePerfect;
+        performance = "scorePerfect";
     }
 
-    return [totalScore, message];
+    return {totalScore: totalScore,
+            routeCoins: routeCoins,
+            instrCoins: instrCoins,
+            maxScore: this.maxScore,
+            performance: performance,
+            pathLengthScore: pathLengthScore,
+            maxScoreForPathLength: this.maxScoreForPathLength,
+            instrScore: instrScore,
+            maxScoreForNumberOfInstructions: this.maxScoreForNumberOfInstructions,
+            popupMessage: ocargo.messages.endLevelMsg(performance)};
 };
 
-
-// Renders the gained score in coins.
-ocargo.PathFinder.prototype.renderCoins = function(score, maxScore) {
-    var coins = "<div>";
-    var i;
-    for (i = 0; i < Math.floor(score); i++) {
-        coins += "<img src='" + ocargo.Drawing.imageDir + "coins/coin_gold.svg' width='50'>";
-    }
-    if (score - Math.floor(score) > 0) {
-        coins += "<img src='" + ocargo.Drawing.imageDir + "coins/coin_5050_dots.svg' width='50'>";
-    }
-    for (i = Math.ceil(score); i < maxScore; i++) {
-        coins += "<img src='" + ocargo.Drawing.imageDir + "coins/coin_empty_dots.svg' width='50'>";
-    }
-    coins += "      " + score + "/" + maxScore;
-    coins += "</div>";
-
-    return coins;
+/* Return number of coins for each type*/
+ocargo.PathFinder.prototype.getNumCoins = function(score, maxScore) {
+    return {whole: Math.floor(score), half: score - Math.floor(score) > 0 ? 1 : 0, zero: maxScore - Math.ceil(score)};
 };
 
 ocargo.PathFinder.prototype.getTravelledPathScore = function() {
     var travelled = this.van.travelled;
-    var travelledScore = this.maxDistanceScore -
-        (travelled - this.optimalPath.length + 2);
-    
-    return travelledScore;
+    return this.maxScoreForPathLength - (travelled - this.optimalPath.length + 2);
 };
 
-ocargo.PathFinder.prototype.getInstrLengthScore = function() {
-    if (this.modelLength.length === 0) {
-        return 0;
-    }
+ocargo.PathFinder.prototype.getScoreForNumberOfInstructions = function() {
 
-    var userLength = ocargo.blocklyControl.getActiveBlocksCount();
+    var blocksUsed = ocargo.utils.isIOSMode() ? ocargo.game.mobileBlocks : ocargo.blocklyControl.getActiveBlocksCount();
     var algorithmScore = 0;
-    var difference = this.maxInstrLengthScore;
-    for (var i = 0; i < this.modelLength.length; i++) {
-        var currDifference = userLength - this.modelLength[i];
+    var difference = this.maxScoreForNumberOfInstructions;
+    for (var i = 0; i < this.modelSolution.length; i++) {
+        var currDifference = blocksUsed - this.modelSolution[i];
         if (Math.abs(currDifference) < difference) {
             difference = Math.abs(currDifference);
-            algorithmScore = this.maxInstrLengthScore - currDifference;
+            algorithmScore = this.maxScoreForNumberOfInstructions - currDifference;
         }
     }
     return algorithmScore;
@@ -134,7 +121,7 @@ ocargo.PathFinder.prototype.getLength = function(stack) {
 
 
 function getOptimalPath(nodes, destinations) {
-    // Brute force Travelling Salesman implementation, using A* to determinee the connection lengths
+    // Brute force Travelling Salesman implementation, using A* to determine the connection lengths
     // If the map size increases or lots of destinations are required, it may need to be rethought
     var hash = {};
     function getPathBetweenNodes(node1, node2) {
@@ -161,7 +148,7 @@ function getOptimalPath(nodes, destinations) {
         for (var i = 0; i < fragPath.length; i++) {
             if (!fragPath[i]) {
                 return null;
-            } 
+            }
             else {
                 fullPath = fullPath.concat(fragPath[i].slice(1));
             }
@@ -187,7 +174,7 @@ function getOptimalPath(nodes, destinations) {
             array.splice(i, 0, current);
         }
     }
-    
+
     var start = nodes[0];
     var bestScore = Number.POSITIVE_INFINITY;
     var bestPermutationPath = null;
@@ -197,7 +184,7 @@ function getOptimalPath(nodes, destinations) {
         destinationNodes.push(destinations[i].node);
     }
     permute(destinationNodes);
-    
+
     for (var i = 0; i < permutations.length; i++) {
         var permutation = permutations[i];
         var permutationPath = getPermutationPath(start, permutation, nodes);
@@ -233,7 +220,7 @@ function aStar(origin, destination, nodes) {
         for (var i = 0; i < openSet.lenght; i++) {
             if (reversePriority[nodes.indexOf(openSet[i])] < reversePriority[smallestInReverse]) {
                 smallestInOpen = i;
-                smallestInReverse = nodes.indexOf(openSet[i]); 
+                smallestInReverse = nodes.indexOf(openSet[i]);
             }
         }
         current = openSet[smallestInOpen];

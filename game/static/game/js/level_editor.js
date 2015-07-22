@@ -70,6 +70,9 @@ ocargo.LevelEditor = function() {
     // So that we store the current state when the page unloads
     window.addEventListener('unload', storeStateInLocalStorage);
 
+    // Setup max_fuel
+    setupMaxFuel();
+
     // Initialise the grid
     initialiseGrid();
     setTheme(THEMES.grass);
@@ -217,7 +220,6 @@ ocargo.LevelEditor = function() {
                     ocargo.Drawing.startPopup('Django level migration', 
                         'Copy the text in the console into the Django migration file.',
                         'You will have to change the level name and fill in the model solution field.');
-                    console.log(getLevelTextForDjangoMigration(extractState()));
                 });
             }
         }
@@ -226,11 +228,6 @@ ocargo.LevelEditor = function() {
             tabs.scenery.popup = true;
 
             tabs.scenery.setOnChange(function() {
-                if (tabs.scenery.popup) {
-                    tabs.scenery.popup = false;
-                    ocargo.Drawing.startPopup('', '', ocargo.messages.trafficLightsWarning + ocargo.jsElements.closebutton("Close"));
-                }
-
                 transitionTab(tabs.scenery);
             });
 
@@ -242,20 +239,8 @@ ocargo.LevelEditor = function() {
                 }
             });
 
-            $('#bush').click(function() {
-                new InternalDecor('bush');
-            });
-
-            $('#tree1').click(function() {
-                new InternalDecor('tree1');
-            });
-
-            $('#tree2').click(function() {
-                new InternalDecor('tree2');
-            });
-
-            $('#pond').click(function() {
-                new InternalDecor('pond');
+            $('.decor_button').click(function(e){
+                new InternalDecor(e.target.id);
             });
 
             $('#trafficLightRed').click(function() {
@@ -269,6 +254,7 @@ ocargo.LevelEditor = function() {
                                           "startingState": ocargo.TrafficLight.GREEN,
                                           "sourceCoordinate": null,  "direction": null});
             });
+
         }
 
         function setupCharacterTab() {
@@ -280,7 +266,7 @@ ocargo.LevelEditor = function() {
                 var selectedValue = $(this).val();
                 var character = CHARACTERS[selectedValue];
                 if (character) {
-                    CHARACTER_NAME = character.name;
+                    var CHARACTER_NAME = character.name;
                     $('#character_image').attr('src', character.image);
                     redrawRoad();
                 }
@@ -395,7 +381,7 @@ ocargo.LevelEditor = function() {
                 ocargo.saving.retrieveRandomLevel(data, function(error, mapData) {
                     if (error) {
                         console.error(error);
-                        ocargo.Drawing.startPopup("Error","",ocargo.messages.internetDown + ocargo.jsElements.closebutton("Close"));
+                        ocargo.Drawing.startInternetDownPopup();
                         return;
                     }
 
@@ -474,7 +460,7 @@ ocargo.LevelEditor = function() {
                 if (err !== null) {
                     console.error(err);
                     currentTabSelected.select();
-                    ocargo.Drawing.startPopup("Error","",ocargo.messages.internetDown + ocargo.jsElements.closebutton("Close"));
+                    ocargo.Drawing.startInternetDownPopup();
                     return;
                 }
 
@@ -557,7 +543,7 @@ ocargo.LevelEditor = function() {
             function processListOfLevels(err, ownLevels, sharedLevels) {
                 if (err !== null) {
                     console.error(err);
-                    ocargo.Drawing.startPopup("Error", "", ocargo.messages.internetDown + ocargo.jsElements.closebutton("Close"));
+                    ocargo.Drawing.startInternetDownPopup();
                     return;
                 }
 
@@ -665,7 +651,7 @@ ocargo.LevelEditor = function() {
             function processSharingInformation(error, validRecipients) {
                 if (error !== null) {
                     console.error(error);
-                    ocargo.Drawing.startPopup("Error", "", ocargo.messages.internetDown + ocargo.jsElements.closebutton("Close"));
+                    ocargo.Drawing.startInternetDownPopup();
                     return;
                 }
 
@@ -791,7 +777,7 @@ ocargo.LevelEditor = function() {
 
             tabs.help.setOnChange(function() {
                 currentTabSelected.select();
-                ocargo.Drawing.startPopup('', '', message + ocargo.jsElements.closebutton("Close"));
+                ocargo.Drawing.startPopup('', '', message);
             });
         }
 
@@ -853,6 +839,46 @@ ocargo.LevelEditor = function() {
         }
     }
 
+    /************/
+    /*  MaxFuel */
+    /************/
+
+
+    function setupMaxFuel(){
+        var MAX_FUEL = 99;
+        var DEFAULT_FUEL = 50;
+        var lastCorrectFuel = $('#max_fuel').val();
+        if (!onlyContainsDigits(lastCorrectFuel)) {
+            $('#max_fuel').val(DEFAULT_FUEL);
+            lastCorrectFuel = DEFAULT_FUEL;
+        }
+
+        $('#max_fuel').on('input', function () {
+            var value = $(this).val();
+            $(this).val(updatedValue(value));
+        });
+
+        function restrictValue(value){
+            if (value > MAX_FUEL) {
+                return MAX_FUEL;
+            } else {
+                return value;
+            }
+        }
+        function updatedValue(value){
+            if (onlyContainsDigits(value)) {
+                value = parseInt(value);
+                var newValue = restrictValue(value);
+                lastCorrectFuel = newValue;
+                return newValue;
+            } else {
+                return lastCorrectFuel;
+            }
+        }
+        function onlyContainsDigits(n){
+            return n !== ''  && /^\d+$/.test(n);
+        }
+    }
     /************/
     /* Trashcan */
     /************/
@@ -1791,6 +1817,7 @@ ocargo.LevelEditor = function() {
     /**********************************/
 
     function extractState() {
+
         var state = {};
 
         // Create node data
@@ -1828,6 +1855,7 @@ ocargo.LevelEditor = function() {
         for (i = 0; i < decor.length; i++) {
             state.decor.push(decor[i].getData());
         }
+        state.decor = ocargo.utils.sortObjects(state.decor, "z");
 
         // Destination and origin data
         var destinations = [];
@@ -1844,14 +1872,8 @@ ocargo.LevelEditor = function() {
             state.origin = JSON.stringify({coordinate: [originCoord.x, originCoord.y], direction: direction});
         }
 
-        // Max fuel data
-        var maxFuel = $('#max_fuel').val();
-        if(isNaN(maxFuel) ||  maxFuel ===  '' || parseInt(maxFuel) <= 0 || parseInt(maxFuel) > 99)
-        {
-            maxFuel = 50;
-            $('#max_fuel').val(50);
-        }
-        state.max_fuel = maxFuel;
+        // Starting fuel of the level
+        state.max_fuel = $('#max_fuel').val();
         
         // Language data
         var language = $('#language_select').val();
@@ -1867,6 +1889,7 @@ ocargo.LevelEditor = function() {
     }
 
     function restoreState(state) {
+
         clear();
 
         // Load node data
@@ -1998,7 +2021,7 @@ ocargo.LevelEditor = function() {
     function storeStateInLocalStorage() {
         if (localStorage) {
             var state = extractState();
-            
+
             // Append additional non-level orientated editor state
             state.savedLevelID = savedLevelID;
             state.savedState = savedState;
@@ -2012,6 +2035,7 @@ ocargo.LevelEditor = function() {
         if (localStorage) {
             if (localStorage.levelEditorState) {
                 var state = JSON.parse(localStorage.levelEditorState);
+
                 if (state) {
                     restoreState(state);
                 }
@@ -2030,7 +2054,7 @@ ocargo.LevelEditor = function() {
         if (!originNode || !destinationNodes.length) {
              ocargo.Drawing.startPopup(ocargo.messages.ohNo,
                                        ocargo.messages.noStartOrEndSubtitle,
-                                       ocargo.messages.noStartOrEnd + ocargo.jsElements.closebutton("Close"));
+                                       ocargo.messages.noStartOrEnd);
              return false;
         }
 
@@ -2044,8 +2068,8 @@ ocargo.LevelEditor = function() {
         var pathToDestinations = getOptimalPath(nodes, destinations);
         if (!pathToDestinations) {
             ocargo.Drawing.startPopup(ocargo.messages.somethingWrong,
-                ocargo.messages.noStartEndRouteSubtitle,
-                ocargo.messages.noStartEndRoute + ocargo.jsElements.closebutton("Close"));
+                                      ocargo.messages.noStartEndRouteSubtitle,
+                                      ocargo.messages.noStartEndRoute);
             return false;
         }
 
@@ -2054,7 +2078,7 @@ ocargo.LevelEditor = function() {
         if($(".block_checkbox:checked").length == 0) {
             ocargo.Drawing.startPopup(ocargo.messages.somethingWrong,
                                       ocargo.messages.noBlocksSubtitle,
-                                      ocargo.messages.noBlocks + ocargo.jsElements.closebutton("Close"));
+                                      ocargo.messages.noBlocks);
             return false;
         }
 
@@ -2065,10 +2089,10 @@ ocargo.LevelEditor = function() {
         var currentState = JSON.stringify(extractState());
 
         if (!savedState) {
-            ocargo.Drawing.startPopup("Sharing", "", ocargo.messages.notSaved + ocargo.jsElements.closebutton("Close"));
+            ocargo.Drawing.startPopup("Sharing", "", ocargo.messages.notSaved);
             return false;
         } else if (currentState !== savedState) {
-            ocargo.Drawing.startPopup("Sharing", "", ocargo.messages.changesSinceLastSave + ocargo.jsElements.closebutton("Close"));
+            ocargo.Drawing.startPopup("Sharing", "", ocargo.messages.changesSinceLastSave);
             return false;
         }
         return true;
@@ -2086,7 +2110,7 @@ ocargo.LevelEditor = function() {
         if (USER_STATUS !== "SCHOOL_STUDENT" && USER_STATUS !== "TEACHER" && USER_STATUS !== "SOLO_STUDENT") {
             ocargo.Drawing.startPopup("Not logged in", 
                                       "", 
-                                      ocargo.messages.notLoggedIn(activity) + ocargo.jsElements.closebutton("Close"));
+                                      ocargo.messages.notLoggedIn(activity));
             return false;
         }
         return true;
@@ -2096,7 +2120,7 @@ ocargo.LevelEditor = function() {
         if (USER_STATUS === "SOLO_STUDENT") {
             ocargo.Drawing.startPopup("Sharing as an independent student", 
                                       "", 
-                                      ocargo.messages.soloSharing + ocargo.jsElements.closebutton("Close"));
+                                      ocargo.messages.soloSharing);
             return false;
         }
         return true;
@@ -2219,6 +2243,7 @@ ocargo.LevelEditor = function() {
             var data =  {
                             'x': Math.floor(bBox.x),
                             'y': PAPER_HEIGHT - bBox.height - Math.floor(bBox.y),
+                            'z': currentTheme.decor[this.decorName].z_index,
                             'decorName': this.decorName
                         };
             return data;
@@ -2260,6 +2285,7 @@ ocargo.LevelEditor = function() {
         this.setPosition(paper.scrollLeft(), paper.scrollTop());
 
         decor.push(this);
+
     }
 };
 
@@ -2269,5 +2295,5 @@ ocargo.LevelEditor = function() {
 
 $(function() {
     new ocargo.LevelEditor();
-    ocargo.Drawing.startPopup(ocargo.messages.levelEditorTitle, ocargo.messages.levelEditorSubtitle + ocargo.jsElements.closebutton("Close"));
+    ocargo.Drawing.startPopup(ocargo.messages.levelEditorTitle, ocargo.messages.levelEditorSubtitle, "");
 });

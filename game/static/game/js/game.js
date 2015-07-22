@@ -1,94 +1,5 @@
 'use strict';
 
-'                                   8~Z                                          ';
-'                                     ?                                          ';
-'                                     DD                                         ';
-'                                      IZZ7777$7Z                                ';
-'                                    Z$$Z$I7777777Z                              ';
-'                                 O7IIIIII77777777$       I$$,                   ';
-'                                7?IIIIIII77777777ZOZOO? $Z+ 7 =                 ';
-'                               Z?II I  7777777ZZ$Z$7ZOZODZ$O88                  ';
-'                               OIII  : 777$ZZ$77ZZO7$7ZOODO8O8                  ';
-'                                $III ,7ZO77777OOZZO8$778  7 :                   ';
-'                                Z77ZZII7777OZ77$$$$87IZI                        ';
-'                                ?IIII7Z$ZII8  I77?ZZZZO:                        ';
-'                               $?I$$O?I???? 7I ??O8OZ7O                         ';
-'                              O$O77,II???+~~$7=~?OZ$ZZD                         ';
-'                                 7 N +=,,,,::~~=?IO$8O                          ';
-'                                 D?7+,,,::::~==+??:$$                           ';
-'                                  8~::~~~~~==+++?I7$                            ';
-'                                   DI=====+=????IID                             ';
-'                                     OZ+8=IIIII7Z=O                             ';
-'                                        ?DDZ    8+=D                            ';
-'                                               N=,:8DMM,                        ';
-'                                           8I:Z~Z,:?7=+==N                      ';
-'                                         O7+ ~=8DZ$I+?===+++,                   ';
-'                                         Z+: ~~M?O=+===$+++M8M                  ';
-'                                         M+: =~$M=++==O++D:=+D                  ';
-'                                        =+$:==~M==+==Z++$I+:Z?I:                ';
-'                                       +M+=:==N==$==I++IOD$$7M                  ';
-'                                      7=++=:=I~==:=+++M~DD87+8                  ';
-'                                     ~=7?I=7=M~~,:==++$D$$Z+?~                  ';
-'                            D    7$8Z~?Z+Z+O?=~~,~+++MIOOO?8,??                 ';
-'                           DN   77$Z=$D +?=7?~~~::++=ZID$$?M,?D                 ';
-'                        I$+=888Z77+$O +=::=~M~Z~:+=++ZID$8$M,=D                 ';
-'                      888?~=?888$77O88I:+~~7O88~:=+++Z7IZ7? ,=D                 ';
-'                    8DDDD=~?+NI7II77I?=~~~~~+DDO8++++DZII??D:?$                 ';
-'                  8NNDIO8ZO+?II7777,,,,,,:,,?OZZ8+++++=8$?? :?                  ';
-'                O$77$O$7IZOD+777777,,,,,,~7ZZZZZ7++++++8??88?D                  ';
-'                Z777777777777777$ZZO8Z77IZZZZOO,+++++?+?IO:=I                   ';
-'                888OZZZ$7$$$$$$$$$$$$$$$ZZZ8OOO,=++++??++~~?                    ';
-'                  ZZOOOOOOOOOOOOOO8888OZ88OOOOO,=++++I=,~?D                     ';
-'                  Z7777777$$ZZZOOOOOOOOOOOOOOOO?$Z$D,~~=8~$                     ';
-'                  Z777777$$$$$$$$$$$$$Z8OOOOOO8DI,I+II8,==Z                     ';
-'                  Z77777$$$$$$$$$$$$ZZZ8ZZZOZ:I=DI78???????                     ';
-'                 ?O777$$$$$$$$$$$$ZZZZZZZZZ8$OI~?++++++++++                     ';
-'                  8$$$$$$$$$$$$$ZZZZZZZZZD+DZ+=?=+++++++?ND                     ';
-'                  8$$$$$$$$$$$$ZZZZZZZZZZZZO88?DDD8DDDDD88D                     ';
-'                  8$$$$$$$$$$ZZZZZZZZZZZZZIDI88888O8D88888                      ';
-'                        788OOZZZZZZZZZ8Z8888888888888888DDD                     ';
-'                                    D8D8888DD88O8O8888888O                      ';
-'                                    888888888DOO888888888DD                     ';
-'                                   NOOO88888D8OOOOOO8888888                     ';
-'                                   78OOOO88888OOOOOOOOO8888                     ';
-'                                     ,DDDD~  DOOOO88888O8:                      ';
-'                                      ZI$?       ~NDDZ                          ';
-'                                      IIZ         $77D                          ';
-'                                     ::=Z         $778                          ';
-'                                     8:+D        +,:+                           ';
-'                                     8:+D        D,:?                           ';
-'                                     =:?         D:~I                           ';
-'                                     ?7$         $:=I                           ';
-'                                      ~7         7=+8                           ';
-'                                    =,~O         ?:+D                           ';
-'                                   =ZO?=D        ?,+D                           ';
-'                                   8??=?7D      =7$=O+8                         ';
-'                                    D8D=~       +?+++?D                         ';
-'                                    D:+D        8OOO8=                          ';
-'                                    O:+N         D:~I                           ';
-'                                    $~=D         Z~~?                           ';
-'                                    ?=+8          ::+                           ';
-'                                    I~=D          :~?~                          ';
-'                                    +~+D          D?7D                          ';
-'                                    Z++Z          I:=D                          ';
-'                                 8$  $7OOO        8~+$                          ';
-'                                  ? O777$+        D777$I                        ';
-'                        ,,,,,, =   O?O77$        $    77                        ';
-'                  ,,,,,,,:O?  ,  I:O$777$        $   7Z7~                       ';
-'               ,,,,,,,,$     I7:     7777:,,,,,,7 ?  + Z8,,,,,,                 ';
-'              ,,,,,,,,,?$ZZ77777$ZO$$$ZZ~I,,,,,~+   I77$Z,,,,,,,                ';
-'               ,,,,,,,I~$77$OZI~~~~~~~~=,,,,,,~ :  ?  $$?,,,,,,,,               ';
-'                ,,,,,,,:~~~~~I,,,,,,,,,,,,,,,Z   : O $::,,,,,,,,,               ';
-'                   ,,,,,,,,,,,,,,,,,,,,,,,, O     OI7?,,,,,,,,,,                ';
-'                              ,,,,,,,,,,,,,?+    O77?,,,,,,,,,,                 ';
-'                                      ,,,,+$I77777$~=,,,,,,,,,,                 ';
-'                                     ,,,,,:~~IZO+~~,,,,,,,,,,                   ';
-'                                    ,,,,,,,,,,II,,,,,,,,,,,,                    ';
-'                                    ,,,,,,,,,,,,,,,,,,,,,,                      ';
-'                                    ,,,,,,,,,,,,,,,,,,,,                        ';
-'                                       ,,,,,,,,,,,,,,                           ';
-'                                            ,,                                  ';
-
 var ocargo = ocargo || {};
 
 ocargo.Game = function() {
@@ -153,8 +64,8 @@ ocargo.Game.prototype.setup = function() {
             title = LEVEL_NAME;
         }
     }
-    ocargo.Drawing.startPopup(title, "",
-        LESSON + ocargo.jsElements.closebutton("Play") + loggedOutWarning, true);
+    ocargo.Drawing.startPopup(title, LESSON,
+         loggedOutWarning, true, ocargo.button.getDismissButtonHtml('Play'));
 };
 
 ocargo.Game.prototype.reset = function() {
@@ -168,7 +79,7 @@ ocargo.Game.prototype.reset = function() {
     ocargo.animation.resetAnimation();
 };
 
-ocargo.Game.prototype.runProgramAndPrepareAnimation = function() {
+ocargo.Game.prototype.runProgramAndPrepareAnimation = function(blocks) {
     this.reset();
 
     ocargo.event.sendEvent("PlayButtonPressed", { levelName: LEVEL_NAME,
@@ -177,10 +88,11 @@ ocargo.Game.prototype.runProgramAndPrepareAnimation = function() {
                                                   failures: this.failures,
                                                   pythonWorkspace: ocargo.pythonControl.getCode() });
 
-    var result = ocargo.controller.prepare();
+    var result = ocargo.controller.prepare(blocks);
     if (!result.success) {
         ocargo.sound.tension();
-        ocargo.Drawing.startPopup(ocargo.messages.failTitle, "", result.error, false);
+        ocargo.Drawing.startPopup(ocargo.messages.failTitle, "",
+                                    result.error);
         return false;
     }
     var program = result.program;
@@ -190,6 +102,7 @@ ocargo.Game.prototype.runProgramAndPrepareAnimation = function() {
     // Starting sound
     ocargo.animation.appendAnimation({
         type: 'callable',
+        functionType: 'playSound',
         functionCall: ocargo.sound.starting,
         description: 'starting sound',
         animationLength: 820
@@ -198,6 +111,7 @@ ocargo.Game.prototype.runProgramAndPrepareAnimation = function() {
 
     ocargo.animation.appendAnimation({
         type: 'callable',
+        functionType: 'playSound',
         functionCall: ocargo.sound.start_engine,
         description: 'starting engine',
     });
@@ -206,12 +120,14 @@ ocargo.Game.prototype.runProgramAndPrepareAnimation = function() {
     // Set controls ready for user to reset
     ocargo.animation.appendAnimation({
         type: 'callable',
+        functionType: 'onStopControls',
         functionCall: function() {ocargo.game.onStopControls();},
         description: 'onStopControls'
     });
 
     ocargo.animation.appendAnimation({
         type: 'callable',
+        functionType: 'playSound',
         functionCall: ocargo.sound.stop_engine,
         description: 'stopping engine'
     });
@@ -285,7 +201,7 @@ ocargo.Game.prototype.allowCodeChanges = function(changesAllowed) {
 ocargo.Game.prototype.setupFuelGauge = function(nodes, blocks) {
     if (FUEL_GAUGE) {
         document.getElementById('fuelGauge').style.visibility='visible';
-        
+
         for(var i = 0; i < blocks.length; i++) {
             if(blocks[i].type === "turn_around" || blocks[i].type === "wait") {
                 return;
@@ -377,7 +293,7 @@ ocargo.Game.prototype.setupSliderListeners = function() {
         $('#paper').css('width', (100 - consoleSliderPosition) + '%');
         $('#tab_panes').css('width', consoleSliderPosition + '%');
         $('#direct_drive').css('left', consoleSliderPosition + '%');
-        
+
         ocargo.blocklyControl.redrawBlockly();
     };
 
@@ -472,16 +388,16 @@ ocargo.Game.prototype.setupTabs = function() {
         $('#clear_console').click(function (e) {
             $('#consoleOutput').text('');
         });
-        
+
         $('#van_commands_help').click(function (e) {
-            var leadMsg = ocargo.messages.pythonCommands + ocargo.jsElements.closebutton("Close");
-            ocargo.Drawing.startPopup("Python Commands", leadMsg, null, true);
+            var leadMsg = ocargo.messages.pythonCommands;
+            ocargo.Drawing.startPopup("Python Commands", leadMsg, "", true);
         });
 
         $('#convert_from_blockly').click(function (e) {
             ocargo.pythonControl.appendCode(ocargo.blocklyCompiler.workspaceToPython());
         });
-        
+
         tabs.python.setOnChange(function() {
             var tab = tabs.python;
             // Only clear console when changing *to* python?
@@ -520,7 +436,7 @@ ocargo.Game.prototype.setupTabs = function() {
                     ocargo.animation.playAnimation();
                     $('#clear_console').click();
                 }
-                
+
             }
             else if (existingHtml == 'Pause') {
                 ocargo.game.onPauseControls();
@@ -560,7 +476,7 @@ ocargo.Game.prototype.setupTabs = function() {
                     ocargo.game.onPauseControls();
                 }
             });
-            
+
             ocargo.game.onStepControls();
             ocargo.game.currentTabSelected.select();
         });
@@ -581,9 +497,7 @@ ocargo.Game.prototype.setupTabs = function() {
 
             ocargo.saving.retrieveListOfWorkspaces(function(err, workspaces) {
                 if (err !== null) {
-                    ocargo.Drawing.startPopup(
-                        "Error", "" , 
-                        ocargo.messages.internetDown + ocargo.jsElements.closebutton("Close"));
+                    ocargo.Drawing.startInternetDownPopup();
                     console.error(err);
                     return;
                 }
@@ -594,11 +508,19 @@ ocargo.Game.prototype.setupTabs = function() {
 
         $('#loadWorkspace').click(function() {
             if (selectedWorkspace) {
+
+                // Blockly or Python tab must be selected before domToWorkspace is called
+                // Otherwise blocks will be chopped off or python editor will not be updated
+                if (PYTHON_ENABLED) {
+                    tabs.python.select();
+                }
+                if (BLOCKLY_ENABLED) {
+                    tabs.blockly.select();
+                }
+
                 ocargo.saving.retrieveWorkspace(selectedWorkspace, function(err, workspace) {
                     if (err !== null) {
-                        ocargo.Drawing.startPopup(
-                            "Error" , "" ,
-                            ocargo.messages.internetDown + ocargo.jsElements.closebutton("Close"));
+                        ocargo.Drawing.startInternetDownPopup();
                         console.error(err);
                         return;
                     }
@@ -612,12 +534,7 @@ ocargo.Game.prototype.setupTabs = function() {
 
                     $('#loadModal').foundation('reveal', 'close');
                 });
-                if (PYTHON_ENABLED) {
-                    tabs.python.select();
-                }
-                if (BLOCKLY_ENABLED) {
-                    tabs.blockly.select();
-                }
+
             }
         });
 
@@ -625,9 +542,7 @@ ocargo.Game.prototype.setupTabs = function() {
             if (selectedWorkspace) {
                 ocargo.saving.deleteWorkspace(selectedWorkspace, function(err, workspaces) {
                     if (err !== null) {
-                        ocargo.Drawing.startPopup(
-                            "Error", "",
-                            ocargo.messages.internetDown + ocargo.jsElements.closebutton("Close"));
+                        ocargo.Drawing.startInternetDownPopup();
                         console.error(err);
                         return;
                     }
@@ -652,7 +567,7 @@ ocargo.Game.prototype.setupTabs = function() {
             var empty = workspaces.length === 0;
             $('#load_pane .scrolling-table-wrapper').css('display',  empty ? 'none' : 'block');
             $('#load_pane #does_not_exist').css('display',  empty ? 'block' : 'none');
-            
+
             // But disable all the modal buttons as nothing is selected yet
             selectedWorkspace = null;
             $('#loadWorkspace').attr('disabled', 'disabled');
@@ -674,16 +589,14 @@ ocargo.Game.prototype.setupTabs = function() {
             // TODO Disable the tab to stop users clicking it multiple times
             // whilst waiting for the table data to load
             // JQuery currently throwing errors :()
-            
+
             ocargo.saving.retrieveListOfWorkspaces(function(err, workspaces) {
                 if (err !== null) {
-                    ocargo.Drawing.startPopup(
-                        "Error", "",
-                        ocargo.messages.internetDown + ocargo.jsElements.closebutton("Close"));
+                    ocargo.Drawing.startInternetDownPopup();
                     console.error(err);
                     return;
                 }
-                
+
                 loadInWorkspaces(workspaces);
             });
         });
@@ -693,7 +606,7 @@ ocargo.Game.prototype.setupTabs = function() {
             if (newName && newName !== "") {
                 var table = $("#saveWorkspaceTable");
                 var existingID = null;
-                
+
                 for (var i = 0; i < table[0].rows.length; i++) {
                      var row = table[0].rows[i];
                      var existingName = row.cells[0].innerHTML;
@@ -709,9 +622,7 @@ ocargo.Game.prototype.setupTabs = function() {
 
                 ocargo.saving.saveWorkspace(workspace, existingID, function(err, workspaces) {
                     if (err !== null) {
-                        ocargo.Drawing.startPopup(
-                            "Error", "",
-                            ocargo.messages.internetDown + ocargo.jsElements.closebutton("Close"));
+                        ocargo.Drawing.startInternetDownPopup();
                         console.error(err);
                         return;
                     }
@@ -756,7 +667,7 @@ ocargo.Game.prototype.setupTabs = function() {
     function setupHelpTab() {
         tabs.help.setOnChange(function() {
             ocargo.game.currentTabSelected.select();
-            ocargo.Drawing.startPopup('', '', HINT + ocargo.jsElements.closebutton("Close!"));
+            ocargo.Drawing.startPopup('', '', HINT);
         });
     }
 
@@ -797,22 +708,18 @@ ocargo.Game.prototype.setupTabs = function() {
 
     // Helper method for load and save tabs
     function populateTable (tableName, workspaces) {
-        var table = $('#'+tableName);
-        
+
+        var table = $('#'+tableName),
+            sortedWorkspaces = [];
+
         // Remove click listeners to avoid memory leak and remove all rows
         $('#'+tableName+' td').off('click');
         table.empty();
-        
+
         // Order them alphabetically
-        workspaces.sort(function(a, b) {
-            if (a.name < b.name) {
-                return -1;
-            }
-            else if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        });
+        sortedWorkspaces = ocargo.utils.sortObjects(workspaces,'name');
+
+        workspaces = sortedWorkspaces;
 
         // Add a row to the table for each workspace saved in the database
         for (var i = 0, ii = workspaces.length; i < ii; i++) {
@@ -831,7 +738,7 @@ ocargo.Game.prototype.onPlayControls = function() {
     this.allowCodeChanges(false);
 
     document.getElementById('direct_drive').style.visibility='hidden';
-    
+
     ocargo.game.tabs.play.setContents(ocargo.Drawing.imageDir + 'icons/pause.svg', 'Pause');
     ocargo.game.tabs.step.setEnabled(false);
 
@@ -862,9 +769,9 @@ ocargo.Game.prototype.onStepControls = function() {
 ocargo.Game.prototype.onStopControls = function() {
     this.allowCodeChanges(true);
 
-    // TODO make this hidden unless blocks are clear or something... 
+    // TODO make this hidden unless blocks are clear or something...
     document.getElementById('direct_drive').style.visibility='visible';
-    
+
     ocargo.game.tabs.play.setContents(ocargo.Drawing.imageDir + 'icons/play.svg', 'Play');
     ocargo.game.tabs.step.setEnabled(true);
 

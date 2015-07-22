@@ -31,7 +31,7 @@ ocargo.Drawing = function() {
     var INITIAL_OFFSET_Y = 82;
     var ROTATION_OFFSET_X = 22;
     var ROTATION_OFFSET_Y = CHARACTER_WIDTH - 20;
-    
+
     var DESTINATION_NOT_VISITED_COLOUR = 'red';
     var DESTINATION_VISITED_COLOUR = 'green';
 
@@ -61,7 +61,7 @@ ocargo.Drawing = function() {
             tileImages.push(paper.image(path + 'road/' + tiles[i] + '.svg', 0, 0, GRID_SPACE_SIZE, GRID_SPACE_SIZE));
             tileImages.push(paper.image(path + 'path/' + tiles[i] + '.svg', 0, 0, GRID_SPACE_SIZE, GRID_SPACE_SIZE));
         }
-        
+
         for(var i = 0; i < tileImages.length; i++) {
             tileImages[i].remove()
         }
@@ -165,7 +165,7 @@ ocargo.Drawing = function() {
             var destination = destinations[i].node;
             var variation = getDestinationPosition(destination);
 
-            var destinationRect = paper.rect(destination.coordinate.x * GRID_SPACE_SIZE + PAPER_PADDING, 
+            var destinationRect = paper.rect(destination.coordinate.x * GRID_SPACE_SIZE + PAPER_PADDING,
                                     PAPER_HEIGHT - (destination.coordinate.y * GRID_SPACE_SIZE) - 100 + PAPER_PADDING,
                                     100, 100).attr({'stroke': DESTINATION_NOT_VISITED_COLOUR});
 
@@ -174,7 +174,7 @@ ocargo.Drawing = function() {
                                     PAPER_HEIGHT - (destination.coordinate.y * GRID_SPACE_SIZE) - variation[1] + PAPER_PADDING,
                                     50, 50).transform('r' + variation[2]);
 
-            destinationImages[destinations[i].id] = {rect: destinationRect, 
+            destinationImages[destinations[i].id] = {rect: destinationRect,
                                                     house: destinationHouse};
         }
 
@@ -269,7 +269,7 @@ ocargo.Drawing = function() {
 
         var rotation = calculateInitialRotation(position.previousNode, position.currentNode);
         var transformation = getRotationTransformationAroundCentreOfGridSpace(cfc,
-                                                                              rotation, 
+                                                                              rotation,
                                                                               position.currentNode.coordinate.x,
                                                                               position.currentNode.coordinate.y);
         cfc.transform(transformation);
@@ -296,16 +296,16 @@ ocargo.Drawing = function() {
                 case 1:
                     roadImage = drawDeadEndRoad(node, path);
                     break;
-                
+
                 case 2:
                     roadImage = drawSingleRoadSegment(node.connectedNodes[0], node,
                                                       node.connectedNodes[1], path);
                     break;
-                
+
                 case 3:
                     roadImage = drawTJunction(node, path);
                     break;
-                
+
                 case 4:
                     roadImage = drawCrossRoads(node, path);
                     break;
@@ -443,7 +443,7 @@ ocargo.Drawing = function() {
         // get position based on nodes
         var x = (controlledCoordinate.x + sourceCoordinate.x) / 2.0;
         var y = (controlledCoordinate.y + sourceCoordinate.y) / 2.0;
-        
+
         // get rotation based on nodes (should face source)
         var angle = sourceCoordinate.angleTo(controlledCoordinate) * (180 / Math.PI);
         var rotation = 90 - angle;
@@ -466,11 +466,11 @@ ocargo.Drawing = function() {
 
             this.setTrafficLightImagePosition(sourceCoordinate, controlledCoordinate, trafficLight.greenLightEl);
             this.setTrafficLightImagePosition(sourceCoordinate, controlledCoordinate, trafficLight.redLightEl);
-            
+
             // hide light which isn't the starting state
             if(trafficLight.startingState === ocargo.TrafficLight.RED) {
                 trafficLight.greenLightEl.attr({'opacity': 0});
-            } 
+            }
             else {
                 trafficLight.redLightEl.attr({'opacity': 0});
             }
@@ -486,13 +486,13 @@ ocargo.Drawing = function() {
 
         var rotation = calculateInitialRotation(position.previousNode, position.currentNode);
         var transformation = getRotationTransformationAroundCentreOfGridSpace(vanImage,
-                                                                              rotation, 
+                                                                              rotation,
                                                                               position.currentNode.coordinate.x,
                                                                               position.currentNode.coordinate.y);
         vanImage.transform(transformation);
         vanImage.transform('... r90');
         vanImage.attr({opacity: 1});
-    };    
+    };
 
     this.renderVans = function(position, numVans) {
         for (var i = 0; i < numVans; i++) {
@@ -771,7 +771,7 @@ ocargo.Drawing = function() {
         }, vanID, animationLength, animateExplosion);
 
         function animateExplosion() {
-            
+
             if (CHARACTER_NAME !== "Van") {
                 return;
             }
@@ -801,7 +801,7 @@ ocargo.Drawing = function() {
                         var size = minSize + Math.random()*(maxSize-minSize);
                         var xco = x + width*(Math.random()-0.5) - 0.5*size;
                         var yco = y + height*(Math.random()-0.5) - 0.5*size;
-                        var imageStr = ocargo.Drawing.raphaelImageDir + '' + (Math.random() < 0.5 ? 'smoke' : 'fire') + '.svg'; 
+                        var imageStr = ocargo.Drawing.raphaelImageDir + '' + (Math.random() < 0.5 ? 'smoke' : 'fire') + '.svg';
                         var img = paper.image(imageStr, xco, yco, size, size);
                         img.animate({opacity: 0, transform: 's2'}, 1000, function () {img.remove()});
                     },(i < 5 ? 0 :(i-5)*50));
@@ -865,8 +865,18 @@ ocargo.Drawing.translate = function(coordinate) {
     return new ocargo.Coordinate(coordinate.x, GRID_HEIGHT - 1 - coordinate.y);
 };
 
-// This is the function that starts the pop-up.
-ocargo.Drawing.startPopup = function(title, subtitle, message, mascot, delay, buttons) {
+/*
+ This is the function that starts the pop-up.
+ Buttons should be passed in separately to the function instead of concatenating
+ to the message so as to keep the layout of the pop-up consistent.
+ The following elements will be displayed vertically from top to bottom in this order:
+ 1. title (bolded)
+ 2. subtitle (same font size as title)
+ 3. message (smaller font size than title and subtitle)
+ 4. buttons (in one row)
+ Mascot will be displayed on the right hand side of the popup
+ */
+ocargo.Drawing.startPopup = function(title, subtitle, message, mascot, buttons, delay) {
     $('#myModal-title').html(title);
     $('#myModal-lead').html(subtitle);
     $('#myModal-mainText').html(message);
@@ -876,12 +886,11 @@ ocargo.Drawing.startPopup = function(title, subtitle, message, mascot, delay, bu
     } else {
         $('#modal-mascot').hide();
     }
-    
+
     if(buttons){
         $('#modal-buttons').html(buttons);
-        $('#modal-buttons').show();
     } else {
-        $('#modal-buttons').hide();
+        $('#modal-buttons').html(ocargo.button.getDismissButtonHtml("Close"));
     }
 
     setTimeout( function() { $('#myModal').foundation('reveal', 'open'); }, delay);
@@ -890,10 +899,15 @@ ocargo.Drawing.startPopup = function(title, subtitle, message, mascot, delay, bu
 // This is the function that starts the pop-up with a yes and a no button
 ocargo.Drawing.startYesNoPopup = function(title, subtitle, message, yesFunction, noFunction, mascot, delay) {
     var buttonHtml = '<button id="modal-yesBtn" class="navigation_button long_button">Yes</button> <button id="modal-noBtn" class="navigation_button long_button">No</button>';
-    ocargo.Drawing.startPopup(title, subtitle, message, mascot, delay, buttonHtml);
+    ocargo.Drawing.startPopup(title, subtitle, message, mascot, buttonHtml, delay);
     $('#modal-yesBtn').click(yesFunction);
     $('#modal-noBtn').click(noFunction);
 };
+
+// This is the function that starts the pop-up when there is no internet connection while playing the game
+ocargo.Drawing.startInternetDownPopup = function(){
+    ocargo.Drawing.startPopup(ocargo.messages.errorTitle,"",ocargo.messages.internetDown);
+}
 
 ocargo.Drawing.showButtonHelp = function(){
     $('#myModal-lead').html('');
@@ -909,6 +923,22 @@ ocargo.Drawing.isMobile = function() {
 
 ocargo.Drawing.isChrome = function() {
     return navigator.userAgent.indexOf('Chrome') > -1;
+};
+
+ocargo.Drawing.renderCoins = function(coins) {
+    var html = "<div>";
+    var i;
+    for (i = 0; i < coins.whole ; i++) {
+        html += "<img src='" + ocargo.Drawing.imageDir + "coins/coin_gold.svg' width='50'>";
+    }
+    if (coins.half) {
+        html += "<img src='" + ocargo.Drawing.imageDir + "coins/coin_5050_dots.svg' width='50'>";
+    }
+    for (i = 0; i < coins.zero; i++) {
+        html += "<img src='" + ocargo.Drawing.imageDir + "coins/coin_empty_dots.svg' width='50'>";
+    }
+
+    return html;
 };
 
 ocargo.Drawing.imageDir = '/static/game/image/';

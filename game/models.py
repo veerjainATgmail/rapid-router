@@ -27,6 +27,7 @@ class Decor(models.Model):
     width = models.IntegerField()
     height = models.IntegerField()
     theme = models.ForeignKey(Theme, related_name='decor')
+    z_index = models.IntegerField()
 
 
 class Character(models.Model):
@@ -49,7 +50,7 @@ class Episode (models.Model):
     r_loopiness = models.FloatField(default=0, null=True)
     r_curviness = models.FloatField(default=0, null=True)
     r_num_tiles = models.IntegerField(default=5, null=True)
-    r_blocks = models.ManyToManyField(Block, related_name='episodes', null=True)
+    r_blocks = models.ManyToManyField(Block, related_name='episodes')
     r_blocklyEnabled = models.BooleanField(default=True)
     r_pythonEnabled = models.BooleanField(default=False)
     r_trafficLights = models.BooleanField(default=False)
@@ -67,6 +68,15 @@ class Episode (models.Model):
     def __unicode__(self):
         return 'Episode: ' + self.name
 
+class LevelManager(models.Manager):
+    def sorted_levels(self):
+        # Sorts all the levels by integer conversion of "name" which should equate to the correct play order
+        # Custom levels do not have an episode
+
+        return sort_levels(self.model.objects.filter(episode__isnull=False))
+
+def sort_levels(levels):
+    return sorted(levels, key=lambda level: int(level.name))
 
 class Level (models.Model):
     name = models.CharField(max_length=100)
@@ -81,7 +91,7 @@ class Level (models.Model):
     max_fuel = models.IntegerField(default=50)
     direct_drive = models.BooleanField(default=False)
     next_level = models.ForeignKey('self', null=True, default=None)
-    shared_with = models.ManyToManyField(User, related_name="shared", blank=True, null=True)
+    shared_with = models.ManyToManyField(User, related_name="shared", blank=True)
     model_solution = models.CharField(blank=True, max_length=20, default='[]')
     disable_route_score = models.BooleanField(default=False)
     threads = models.IntegerField(blank=False, default=1)
@@ -91,9 +101,10 @@ class Level (models.Model):
     theme = models.ForeignKey(Theme, blank=True, null=True, default=None)
     character = models.ForeignKey(Character, default=1)
     anonymous = models.BooleanField(default=False)
+    objects = LevelManager()
 
     def __unicode__(self):
-        return 'Level ' + str(self.id)
+        return 'Level ' + str(self.name)
     
 
 class LevelBlock(models.Model):
@@ -124,3 +135,6 @@ class Attempt (models.Model):
     score = models.FloatField(default=0, null=True)
     workspace = models.TextField(default="")
     python_workspace = models.TextField(default="")
+
+    def elapsed_time(self):
+        return self.finish_time - self.start_time

@@ -5,40 +5,33 @@ var ocargo = ocargo || {};
 var ANIMATION_LENGTH = 500;
 
 ocargo.Animation = function(model, decor, numVans) {
-	this.model = model;
-	this.decor = decor;
-	this.numVans = numVans;
+    this.model = model;
+    this.decor = decor;
+    this.numVans = numVans;
 
-	// timer identifier for pausing
-	this.playTimer = -1;
+    // timer identifier for pausing
+    this.playTimer = -1;
 
-	ocargo.drawing.clearPaper();
-	ocargo.drawing.renderMap(this.model.map);
-	ocargo.drawing.renderDecor(this.decor);
-	ocargo.drawing.renderVans(this.model.map.getStartingPosition(), this.numVans);
-	ocargo.drawing.renderOrigin(this.model.map.getStartingPosition());
-	ocargo.drawing.renderDestinations(this.model.map.getDestinations());
-	ocargo.drawing.renderTrafficLights(this.model.trafficLights);
+    ocargo.drawing.clearPaper();
+    ocargo.drawing.renderMap(this.model.map);
+    ocargo.drawing.renderDecor(this.decor);
+    ocargo.drawing.renderVans(this.model.map.getStartingPosition(), this.numVans);
+    ocargo.drawing.renderOrigin(this.model.map.getStartingPosition());
+    ocargo.drawing.renderDestinations(this.model.map.getDestinations());
+    ocargo.drawing.renderTrafficLights(this.model.trafficLights);
 
-    this.updateFuelGauge(100);
+     this.updateFuelGauge(100);
 };
 
 ocargo.Animation.prototype.isFinished = function() {
 	return this.finished;
 };
 
-ocargo.Animation.prototype.wasJustReset = function() {
-	return (!this.isFinished() && this.animationQueue.length === 1 &&
-			this.animationQueue[0].length === 1 && this.animationQueue[0][0].length === 0);
-};
-
 ocargo.Animation.prototype.resetAnimation = function() {
-	this.animationQueue = [[[]]];
+	this.animationQueue = [[]];
 
 	this.timestamp = 0;
-	this.subTimestamp = 0;
 	this.lastTimestamp = 0;
-	this.lastSubTimestamp = 0;
 	this.isPlaying = false;
 	this.currentlyAnimating = false;
 	this.finished = false;
@@ -74,24 +67,13 @@ ocargo.Animation.prototype.stepAnimation = function(callback) {
 	var timestampQueue = this.animationQueue[this.timestamp];
 
 	if (timestampQueue) {
-		// Perform all events for this subTimestamp
-		var subTimestampQueue = timestampQueue[this.subTimestamp];
-		if (subTimestampQueue) {
-			while (subTimestampQueue.length > 0) {
-				var delay = this.performAnimation(subTimestampQueue.shift());
-				maxDelay = Math.max(maxDelay, delay);
-			}
+		// Perform all events for this timestamp
+		while (timestampQueue.length > 0) {
+			var delay = this.performAnimation(timestampQueue.shift());
+			maxDelay = Math.max(maxDelay, delay);
 		}
-
-		// And move onto the next subTimestamp
-		this.subTimestamp += 1;
-	}
-
-	// Go to the next timestamp if there are no events for this one
-	// or if we've performed them all already
-	if (!timestampQueue || this.subTimestamp >= timestampQueue.length) {
+		// And move onto the next timestamp
 		this.timestamp += 1;
-		this.subTimestamp = 0;
 	}
 
 	// Check if we've performed all events we have
@@ -124,49 +106,20 @@ ocargo.Animation.prototype.pauseAnimation = function() {
 	this.isPlaying = false;
 };
 
-ocargo.Animation.prototype.queueAnimation = function(a) {
-	if (a.timestamp && a.subTimestamp) {
-		if (!this.animationQueue[a.timestamp]) {
-			this.animationQueue[a.timestamp] = [];
-		}
-		if (!this.animationQueue[a.timestamp][a.subTimestamp]) {
-			this.animationQueue[a.timestamp][a.subTimestamp] = [];
-		}
-		this.animationQueue[a.timestamp][a.subTimestamp].push(a);
-
-		this.lastTimestamp = Math.max(this.lastTimestamp, a.timestamp);
-		this.lastSubTimestamp = Math.max(this.lastSubTimestamp, a.subTimestamp);
-	}
-	// Remove duplicate animations... or make any animations that could potentially appear twice idempotent... Undecided...
-};
-
-ocargo.Animation.prototype.queueAnimations = function(as) {
-	for (var i = 0; i < as.length; i++) {
-		this.queueAnimation(as[i]);
-	}
-};
-
 ocargo.Animation.prototype.appendAnimation = function(a) {
-	this.animationQueue[this.lastTimestamp][this.lastSubTimestamp].push(a);
-};
-
-ocargo.Animation.prototype.startNewSubTimestamp = function() {
-	this.lastSubTimestamp += 1;
-
-	this.animationQueue[this.lastTimestamp][this.lastSubTimestamp] = [];
+	this.animationQueue[this.lastTimestamp].push(a);
 };
 
 ocargo.Animation.prototype.startNewTimestamp = function() {
 	this.lastTimestamp += 1;
-	this.lastSubTimestamp = 0;
 
-	this.animationQueue[this.lastTimestamp] = [[]];
+	this.animationQueue[this.lastTimestamp] = [];
 };
 
 ocargo.Animation.prototype.performAnimation = function(a) {
 	// animation length is either default or may be custom set
 	var animationLength = a.animationLength || ANIMATION_LENGTH;
-
+	//console.log("Type: " + a.type + " Description: " + a.description);
 	switch (a.type) {
 		case 'callable':
 			animationLength = a.animationLength || 0;
@@ -222,46 +175,73 @@ ocargo.Animation.prototype.performAnimation = function(a) {
 		case 'popup':
 			var title = "";
 			var leadMsg = a.popupMessage;
+			var buttons = '';
+
 			// sort popup...
 			switch (a.popupType) {
 				case 'WIN':
 					title = ocargo.messages.winTitle;
-					var levelMsg = "";
+					var levelMsg = [];
+
+					levelMsg.push(ocargo.messages.pathScore + ocargo.Drawing.renderCoins(a.routeCoins) + a.pathLengthScore + "/" + a.maxScoreForPathLength);
+
+					levelMsg.push(ocargo.messages.algorithmScore +
+					ocargo.Drawing.renderCoins(a.instrCoins) + a.instrScore + "/" + a.maxScoreForNumberOfInstructions);
+
+					levelMsg.push(ocargo.messages.totalScore(a.totalScore, a.maxScore));
+
+					levelMsg.push(leadMsg);
+
+					if(a.performance != "scorePerfect"){
+						buttons += ocargo.button.getTryAgainButtonHtml();
+					}
 
 					if (BLOCKLY_ENABLED && PYTHON_ENABLED && ocargo.game.currentTabSelected == ocargo.game.tabs.blockly) {
-						levelMsg = ocargo.messages.nowTryPython + ocargo.jsElements.closebutton("Close");
+						levelMsg.push(ocargo.messages.nowTryPython);
+						buttons += ocargo.button.addDismissButtonHtml('Close');
 					}
 					else {
+						// If there exists next level, add a button which redirects the user to that
 						if (NEXT_LEVEL) {
-					        levelMsg = ocargo.jsElements.redirectButton("'/rapidrouter/" + NEXT_LEVEL + "/'",
+							buttons += ocargo.button.getRedirectButtonHtml("'/rapidrouter/" + NEXT_LEVEL + "/'",
 					        								     		'Next Level');
-					    } 
+					    }
 					    else {
+							/*
+							 This is the last level of the episode. If there exists a next episode, add button to
+							 redirect user to it or level selection page.
+							 If this is a default level and there isn't a next episode, user has reached the end of the
+							 game. Add button to encourage users to create their own levels or redirect to level
+							 selection page.
+							 */
+
 					        if (NEXT_EPISODE) {
-					            levelMsg = '<br><br>' + ocargo.messages.nextEpisode(NEXT_EPISODE);
-					        } 
-					        else if(MODEL_SOLUTION.length > 0) {
+					            levelMsg = '<br><br>' + ocargo.messages.nextEpisode(NEXT_EPISODE, RANDOM);
+								buttons += ocargo.jsElements.nextEpisodeButton(NEXT_EPISODE, RANDOM);
+					        }
+					        else if(DEFAULT_LEVEL) {
 					            levelMsg = ocargo.messages.lastLevel;
+								buttons += ocargo.button.getRedirectButtonHtml("'/rapidrouter/level_editor/'", "Create your own map!");
+								buttons += ocargo.button.getRedirectButtonHtml("'/rapidrouter/'", "Home");
 					        }
 					    }
 					}
-					leadMsg = leadMsg + levelMsg;
+					leadMsg = ocargo.messages.addNewLine(levelMsg);
 					break;
 				case 'FAIL':
 					title = ocargo.messages.failTitle;
-					leadMsg = leadMsg + ocargo.jsElements.closebutton(ocargo.messages.tryagainLabel);
+					buttons = ocargo.button.getTryAgainButtonHtml();
 					break;
 				case 'WARNING':
-					title = ocargo.messages.ohNo;
-					leadMsg = leadMsg + ocargo.jsElements.closebutton(ocargo.messages.tryagainLabel);
+					buttons = ocargo.button.getTryAgainButtonHtml();
 					break;
 			}
 			var otherMsg = "";
 			if (a.popupHint) {
-				leadMsg += '<button class="navigation_button long_button" id="hintPopupBtn"><span>' + ocargo.messages.needHint + '</span></button>';
+				buttons += '<button class="navigation_button long_button" id="hintPopupBtn"><span>' + ocargo.messages.needHint + '</span></button>';
 				otherMsg = '<div id="hintBtnPara">' + '</div><div id="hintText">' + HINT + '</div>';
 			}
-			ocargo.Drawing.startPopup(title, leadMsg, otherMsg, true);
+			ocargo.Drawing.startPopup(title, leadMsg, otherMsg, true, buttons);
 			if (a.popupHint) {
 				$("#hintPopupBtn").click( function(){
 	                    $("#hintText").show(500);
@@ -287,3 +267,53 @@ ocargo.Animation.prototype.updateFuelGauge = function(fuelPercentage) {
     document.getElementById('fuelGaugePointer').style.transform = rotation;
     document.getElementById('fuelGaugePointer').style.webkitTransform = rotation;
 };
+
+ocargo.Animation.prototype.serializeAnimationQueue = function(blocks){
+	var replacer = function (key, val) {
+		function clone(obj) {
+			var target = {};
+			for (var i in obj) {
+				if (obj.hasOwnProperty(i)) {
+					target[i] = obj[i];
+				}
+			}
+			return target;
+		}
+
+		if (key == "previousNode" || key == "currentNode"){
+			// Replaces array of nodes to array of coordinates as nodes have circular reference
+			var result = [];
+			var modifiedVal = clone(val); // val has to be cloned to avoid modifying the original nodes
+			for(var i = 0 ; i < modifiedVal.connectedNodes.length ; i++){
+				result.push({coordinate: modifiedVal.connectedNodes[i].coordinate});
+			}
+			modifiedVal.connectedNodes = result;
+			return modifiedVal;
+		}
+		if (val instanceof ocargo.Node){
+			return val.coordinate;
+		}
+		return val;
+	};
+
+	/* Use for calculating algorithm score as blocks used by mobile are not added to Blockly workspace */
+	ocargo.game.mobileBlocks = blocks.length;
+	ocargo.game.runProgramAndPrepareAnimation(blocks);
+
+	var result = ocargo.animation.animationQueue;
+	/* Replaces type with functionType if the animation is callable as api cannot pass function to mobile app */
+	for (var i = 0 ; i < result.length ; i ++ ){
+		for (var j = 0 ; j < result[i].length ; j++){
+			if(result[i][j].functionType){
+				result[i][j]["type"] = result[i][j].functionType;
+				delete result[i][j]["functionType"];
+			}
+		}
+	}
+
+	var json = JSON.stringify(result, replacer);
+	if(ocargo.utils.isIOSMode()){
+        webkit.messageHandlers.handler.postMessage(json);
+    }
+	return json;
+}
