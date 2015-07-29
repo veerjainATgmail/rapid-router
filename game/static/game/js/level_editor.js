@@ -10,11 +10,6 @@ ocargo.LevelEditor = function() {
 
     var LIGHT_RED_URL = ocargo.Drawing.raphaelImageDir + 'trafficLight_red.svg';
     var LIGHT_GREEN_URL = ocargo.Drawing.raphaelImageDir + 'trafficLight_green.svg';
-    
-    var ADD_ROAD_IMG_URL = ocargo.Drawing.imageDir + "icons/add_road.svg";
-    var DELETE_ROAD_IMG_URL = ocargo.Drawing.imageDir + "icons/delete_road.svg";
-    var MARK_START_IMG_URL = ocargo.Drawing.imageDir + "icons/origin.svg";
-    var MARK_END_IMG_URL = ocargo.Drawing.imageDir + "icons/destination.svg";
 
     var VALID_LIGHT_COLOUR = '#87E34D';
     var INVALID_LIGHT_COLOUR = '#E35F4D';
@@ -49,7 +44,6 @@ ocargo.LevelEditor = function() {
 
     // Current mode the user is in
     var mode = modes.ADD_ROAD_MODE;
-    var prevMode = null;
 
     // Holds the state for when the user is drawing or deleting roads
     var strikeStart = null;
@@ -266,7 +260,6 @@ ocargo.LevelEditor = function() {
                 var selectedValue = $(this).val();
                 var character = CHARACTERS[selectedValue];
                 if (character) {
-                    var CHARACTER_NAME = character.name;
                     $('#character_image').attr('src', character.image);
                     redrawRoad();
                 }
@@ -300,7 +293,6 @@ ocargo.LevelEditor = function() {
 
             // Language controls
             $('#language_select').change(function() {
-                var value = $(this).val();
                 $('#blockly_blocks_div').css('display', this.value === 'python' ? 'none' : 'block');
             });
 
@@ -414,7 +406,7 @@ ocargo.LevelEditor = function() {
                 populateLoadSaveTable("loadLevelTable", levels);
 
                 // Add click listeners to all rows
-                $('#loadLevelTable tr[value]').on('click', function(event) {
+                $('#loadLevelTable tr[value]').on('click', function() {
                     $('#loadLevelTable tr').attr('selected', false);
                     $('#loadLevelTable tr').css('selected', false);
                     $(this).attr('selected', true);
@@ -540,7 +532,7 @@ ocargo.LevelEditor = function() {
                 }
             });
 
-            function processListOfLevels(err, ownLevels, sharedLevels) {
+            function processListOfLevels(err, ownLevels) {
                 if (err !== null) {
                     console.error(err);
                     ocargo.Drawing.startInternetDownPopup();
@@ -633,7 +625,6 @@ ocargo.LevelEditor = function() {
                     return;
                 }
 
-                var statusDesired = allShared ? 'shared' : 'unshared';
                 var actionDesired = allShared ? 'unshare' : 'share';
 
                 var recipientIDs = [];
@@ -657,7 +648,6 @@ ocargo.LevelEditor = function() {
 
                 if (USER_STATUS === "SCHOOL_STUDENT") {
                     var classmates = validRecipients.classmates;
-                    var teacher = validRecipients.teacher;
 
                     populateSharingTable(classmates);
                 } else if (USER_STATUS === "TEACHER") {
@@ -668,7 +658,7 @@ ocargo.LevelEditor = function() {
                     for (var i = 0; i < classesTaught.length; i++) {
                         var option = $('<option>');
                         option.attr( {
-                            value: classesTaught[i].id,
+                            value: classesTaught[i].id
                         });
                         option.text(classesTaught[i].name);
                         $('#class_select').append(option);
@@ -725,7 +715,7 @@ ocargo.LevelEditor = function() {
                     var tableRow = $('<tr>');
                     tableRow.attr( {
                         'value': recipient.id,
-                        'status': status,
+                        'status': status
                     });
                     var rowName = $('<td>').text(recipient.name);
 
@@ -750,7 +740,7 @@ ocargo.LevelEditor = function() {
                 }
 
                 // update click listeners in the new rows
-                $('#shareLevelTable tr[value]').on('click', function(event) {
+                $('#shareLevelTable tr[value]').on('click', function() {
                     if (isLevelSaved() && isLevelOwned()) {
                         var status = this.getAttribute('status');
 
@@ -1045,7 +1035,7 @@ ocargo.LevelEditor = function() {
     /************/
     // Methods for highlighting squares
 
-    function mark(coordMap, colour, opacity, occupied) {
+    function mark(coordMap, colour, opacity) {
         var coordPaper = ocargo.Drawing.translate(coordMap);
         var element = grid[coordPaper.x][coordPaper.y];
         element.attr({fill:colour, "fill-opacity": opacity});
@@ -1144,7 +1134,7 @@ ocargo.LevelEditor = function() {
             };
 
         // Touch events seem to have this behaviour automatically
-    };
+    }
 
     function handleMouseDown(this_rect) {
         return function (ev) {
@@ -1312,7 +1302,7 @@ ocargo.LevelEditor = function() {
             paperY = dy + originY;
 
             // Deal with trashcan
-            checkImageOverTrashcan(paperX, paperY, imageWidth, imageHeight);;
+            checkImageOverTrashcan(paperX, paperY, imageWidth, imageHeight);
 
             // Stop it being dragged off the edge of the page
             if (paperX < 0) {
@@ -1618,9 +1608,6 @@ ocargo.LevelEditor = function() {
             return true;
         }
 
-        function occupied(sourceCoord, controlledCoord) {
-            
-        }
     }
 
     /********************************/
@@ -1731,17 +1718,6 @@ ocargo.LevelEditor = function() {
         }    
     }
 
-    function findTrafficLight(firstIndex, secondIndex) {
-        var light;
-        for (var i = 0; i < trafficLights.length; i++) {
-            light = trafficLights[i];
-            if (light.node === firstIndex && light.sourceNode === secondIndex) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     function setTheme(theme) {
         currentTheme = theme;
 
@@ -1818,7 +1794,7 @@ ocargo.LevelEditor = function() {
         for (i = 0; i < BLOCKS.length; i++) {
             var type = BLOCKS[i];
             if ($('#' + type + "_checkbox").is(':checked')) {
-                var block = {'type': type}
+                var block = {'type': type};
                 var number = $('#' + type + "_number").val();
                 if(number !== "infinity") {
                     block.number = parseInt(number);
@@ -2099,7 +2075,7 @@ ocargo.LevelEditor = function() {
 
         var boolFields = ["pythonEnabled", "blocklyEnabled", 'fuel_gauge', 'direct_drive'];
         var stringFields =  ['path', 'traffic_lights', 'origin', 'destinations'];
-        var otherFields = ['max_fuel']
+        var otherFields = ['max_fuel'];
         
         var decor = null;
         var blocks = null;
@@ -2127,8 +2103,8 @@ ocargo.LevelEditor = function() {
                 console.log("DISCARDING " + propertyName)
             }
         }
-        string += "\t\tmodel_solution=FILL_IN,\n"
-        string += "\t)\n";;
+        string += "\t\tmodel_solution=FILL_IN,\n";
+        string += "\t)\n";
         string += "\tlevelNUMBER.save()\n";
         string += "\tset_decor(levelNUMBER, json.loads('" + decor + "'))\n";
         string += "\tset_blocks(levelNUMBER, json.loads('" + blocks + "'))\n";
