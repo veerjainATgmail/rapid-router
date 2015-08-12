@@ -6,7 +6,6 @@ ocargo.BlocklyControl = function () {
     this.numberOfStartBlocks = THREADS;
 
     this.blocklyCustomisations = new ocargo.BlocklyCustomisations();
-    this.blocklyCustomisations.widenFlyout();
     this.blocklyCustomisations.setupBigCodeMode();
 
     this.blocklyDiv = document.getElementById('blockly_holder');
@@ -14,7 +13,8 @@ ocargo.BlocklyControl = function () {
     Blockly.inject(this.blocklyDiv, {
         path: '/static/game/js/blockly/',
         toolbox: BLOCKLY_XML,
-        trashcan: true
+        trashcan: true,
+        scrollbars: true
     });
 
     this.blocklyCustomisations.setupFlyoutToggling(this.blocklyDiv);
@@ -23,6 +23,11 @@ ocargo.BlocklyControl = function () {
     // Stop the flyout from closing automatically
     Blockly.Flyout.autoClose = false;
 
+    this.blocklyCustomisations.makeFlyoutTransparent();
+    this.blocklyCustomisations.shiftBlockly();
+    this.blocklyCustomisations.shiftWorkspace();
+    this.blocklyCustomisations.hideBlocklyToolbox();
+    this.blocklyCustomisations.makeFlyoutButtonTransparent();
 };
 
 ocargo.BlocklyControl.BLOCK_HEIGHT = 20;
