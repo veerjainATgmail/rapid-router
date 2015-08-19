@@ -2,6 +2,24 @@
 
 var ocargo = ocargo || {};
 
+ocargo.LEconfig = {
+
+    // Level information
+    nodes : [],
+    decor : [],
+    trafficLights : [],
+    originNode : null,
+    destinationNode : null,
+    currentTheme : null,
+
+    // Reference to the Raphael elements for each square
+    grid : {},
+
+    // Holds the state for when the user is drawing or deleting roads
+    strikeStart : null
+
+}
+
 ocargo.LevelEditor = function() {
     
     /*************/
@@ -32,21 +50,20 @@ ocargo.LevelEditor = function() {
     ocargo.drawing.preloadRoadTiles();
 
     // Level information
-    var nodes = [];
-    var decor = [];
-    var trafficLights = [];
-    var originNode = null;
-    var destinationNode = null;
-    var currentTheme = THEMES.grass;
+    var nodes = ocargo.LEconfig.nodes,
+        decor = ocargo.LEconfig.decor,
+        originNode = ocargo.LEconfig.originNode,
+        destinationNode = ocargo.LEconfig.destinationNode,
+        trafficLights = ocargo.LEconfig.trafficLights,
+        currentTheme = ocargo.LEconfig.currentTheme;
 
     // Reference to the Raphael elements for each square
-    var grid;
+    var grid = ocargo.LEconfig.grid;
+
+    var mark = ocargo.LevelEditor.Mark;
 
     // Current mode the user is in
     var mode = modes.ADD_ROAD_MODE;
-
-    // Holds the state for when the user is drawing or deleting roads
-    var strikeStart = null;
 
     // Holds the state to do with saving
     var savedState = null;
@@ -977,7 +994,8 @@ ocargo.LevelEditor = function() {
     /*************/
 
     function initialiseGrid() {
-        grid = ocargo.drawing.createGrid();
+        ocargo.LEconfig.grid = ocargo.drawing.createGrid();
+        grid = ocargo.LEconfig.grid;
         for (var i = 0; i < grid.length; i++) {
             for (var j = 0; j < grid[i].length; j++) {
                 grid[i][j].node.onmousedown = handleMouseDown(grid[i][j]);
@@ -1001,98 +1019,21 @@ ocargo.LevelEditor = function() {
         }
 
         nodes = [];
-        strikeStart = null;
+        ocargo.LEconfig.strikeStart = null;
         originNode = null;
         destinationNode = null;
     }
 
     function drawAll() {
-        ocargo.drawing.renderGrid(grid, currentTheme);
+        ocargo.drawing.renderGrid(ocargo.LEconfig.grid, currentTheme);
         redrawRoad();
     }
 
     function redrawRoad() {
         ocargo.drawing.renderRoad(nodes);
-        clearMarkings();
-        bringTrafficLightsToFront();
-        bringDecorToFront();
-    }
-
-    function bringDecorToFront() {
-        for (var i = 0; i < decor.length; i++) {
-            decor[i].image.toFront();
-        }
-    }
-
-    function bringTrafficLightsToFront() {
-        for (var i = 0; i < trafficLights.length; i++) {
-            trafficLights[i].image.toFront();
-        }
-    }
-
-    /************/
-    /*  Marking */
-    /************/
-    // Methods for highlighting squares
-
-    function mark(coordMap, colour, opacity) {
-        var coordPaper = ocargo.Drawing.translate(coordMap);
-        var element = grid[coordPaper.x][coordPaper.y];
-        element.attr({fill:colour, "fill-opacity": opacity});
-    }
-
-    function markAsOrigin(coordinate) {
-        mark(coordinate, 'red', 0.7, true);
-    }
-
-    function markAsDestination(coordinate) {
-        mark(coordinate, 'blue', 0.7, true);
-    }
-
-    function markAsBackground(coordinate) {
-        mark(coordinate, currentTheme.background, 0, false);
-    }
-
-    function markAsSelected(coordinate) {
-        mark(coordinate, currentTheme.selected, 1, true);
-    }
-
-    function markAsHighlighted(coordinate) {
-        mark(coordinate, currentTheme.selected, 0.3, true);
-    }
-
-    function clearMarkings() {
-        for (var i = 0; i < GRID_WIDTH; i++) {
-            for (var j = 0; j < GRID_HEIGHT; j++) {
-                markAsBackground(new ocargo.Coordinate(i,j));
-                grid[i][j].toFront();
-            }
-        }
-        if (originNode) {
-            markAsOrigin(originNode.coordinate);
-        }
-        if (destinationNode) {
-            markAsDestination(destinationNode.coordinate);
-        }
-
-        bringTrafficLightsToFront();
-        bringDecorToFront();
-    }
-
-    function markTentativeRoad(currentEnd) {
-        clearMarkings();
-        applyAlongStrike(setup, currentEnd);
-
-        var previousNode = null;
-        function setup(x, y) {
-            var coordinate = new ocargo.Coordinate(x, y);
-            var node = new ocargo.Node(coordinate);
-            if (previousNode) {
-                node.addConnectedNodeWithBacklink(previousNode);
-            }
-            previousNode = node;
-            markAsSelected(coordinate);
-        }
+        mark.clearMarkings(currentTheme);
+        ocargo.LevelEditor.render.bringTrafficLightsToFront();
+        ocargo.LevelEditor.render.bringDecorToFront();
     }
 
     /***************************/
@@ -1102,7 +1043,8 @@ ocargo.LevelEditor = function() {
     // Function for making an element "transparent" to mouse events
     // e.g. decor, traffic lights, rubbish bin etc.
     function addReleaseListeners(element) {
-        var lastGridItem;
+        var lastGridItem,
+            strikeStart = ocargo.LEconfig.strikeStart;
 
         element.onmouseover = 
             function(e) {
@@ -1148,13 +1090,13 @@ ocargo.LevelEditor = function() {
             if (mode === modes.MARK_ORIGIN_MODE && existingNode && canPlaceCFC(existingNode)) {
                 if (originNode) {
                     var prevStart = originNode.coordinate;
-                    markAsBackground(prevStart);
+                    mark.markAsBackground(prevStart, currentTheme);
                 }
                 // Check if same as destination node
                 if (isDestinationCoordinate(coordMap)) {
                     destinationNode = null;
                 }
-                markAsOrigin(coordMap);
+                mark.markAsOrigin(coordMap);
                 var newStartIndex = ocargo.Node.findNodeIndexByCoordinate(coordMap, nodes);
 
                 // Putting the new start in the front of the nodes list.
@@ -1165,19 +1107,18 @@ ocargo.LevelEditor = function() {
             } else if (mode === modes.MARK_DESTINATION_MODE && existingNode) {    
                 if (destinationNode) {
                     var prevEnd = destinationNode.coordinate;
-                    markAsBackground(prevEnd);
+                    mark.markAsBackground(prevEnd, currentTheme);
                 }
                 // Check if same as starting node
                 if (isOriginCoordinate(coordMap)) {
                     originNode = null;
                 }
-                markAsDestination(coordMap);
+                mark.markAsDestination(coordMap);
                 var newEnd = ocargo.Node.findNodeIndexByCoordinate(coordMap, nodes);
                 destinationNode = nodes[newEnd];
 
             }  else if (mode === modes.ADD_ROAD_MODE || mode === modes.DELETE_ROAD_MODE) {
-                strikeStart = coordMap;
-                markAsSelected(coordMap);
+                ocargo.LevelEditor.AddRemoveRoad.handleMouseDown(coordMap);
             }
         };
     }
@@ -1195,10 +1136,10 @@ ocargo.LevelEditor = function() {
             var coordMap = ocargo.Drawing.translate(coordPaper);
 
             if (mode === modes.ADD_ROAD_MODE || mode === modes.DELETE_ROAD_MODE) {
-                if (strikeStart !== null) {
-                    markTentativeRoad(coordMap);
+                if (ocargo.LEconfig.strikeStart !== null) {
+                    mark.markTentativeRoad(coordMap, currentTheme);
                 } else if (!isOriginCoordinate(coordMap) && !isDestinationCoordinate(coordMap)) {
-                    markAsHighlighted(coordMap);
+                    mark.markAsHighlighted(coordMap, currentTheme);
                 }
             } else if (mode === modes.MARK_ORIGIN_MODE || mode === modes.MARK_DESTINATION_MODE) {
                 var node = ocargo.Node.findNodeByCoordinate(coordMap, nodes);
@@ -1224,11 +1165,11 @@ ocargo.LevelEditor = function() {
             if (mode === modes.MARK_ORIGIN_MODE || mode === modes.MARK_DESTINATION_MODE) {
                 var node = ocargo.Node.findNodeByCoordinate(coordMap, nodes);
                 if (node && destinationNode !== node && originNode !== node) {
-                    markAsBackground(coordMap);
+                    mark.markAsBackground(coordMap, currentTheme);
                 }
             } else if (mode === modes.ADD_ROAD_MODE || mode === modes.DELETE_ROAD_MODE) {
                 if (!isOriginCoordinate(coordMap) && !isDestinationCoordinate(coordMap)) {
-                    markAsBackground(coordMap);
+                    mark.markAsBackground(coordMap, currentTheme);
                 }
             }
         };
@@ -1412,16 +1353,16 @@ ocargo.LevelEditor = function() {
 
             // Unmark the squares the light previously occupied
             if (sourceCoord) {
-                markAsBackground(sourceCoord);
+                mark.markAsBackground(sourceCoord, currentTheme);
             }
             if (controlledCoord) {
-                markAsBackground(controlledCoord);
+                mark.markAsBackground(controlledCoord, currentTheme);
             }
             if (originNode) {
-                markAsOrigin(originNode.coordinate);
+                mark.markAsOrigin(originNode.coordinate);
             }
             if (destinationNode) {
-                markAsDestination(destinationNode.coordinate);
+                mark.markAsDestination(destinationNode.coordinate);
             }
 
             // Now calculate the source coordinate
@@ -1526,16 +1467,16 @@ ocargo.LevelEditor = function() {
         function onDragEnd() {
             // Unmark squares currently occupied
             if (sourceCoord) {
-                markAsBackground(sourceCoord);
+                mark.markAsBackground(sourceCoord, currentTheme);
             }
             if (controlledCoord) {
-                markAsBackground(controlledCoord);
+                mark.markAsBackground(controlledCoord, currentTheme);
             }
             if (originNode) {
-                markAsOrigin(originNode.coordinate);
+                mark.markAsOrigin(originNode.coordinate);
             }
             if (destinationNode) {
-                markAsDestination(destinationNode.coordinate);
+                mark.markAsDestination(destinationNode.coordinate);
             }
 
             if(trashcanOpen) {
@@ -1628,11 +1569,11 @@ ocargo.LevelEditor = function() {
 
                 // Check if start or destination node        
                 if (isOriginCoordinate(coord)) {
-                    markAsBackground(originNode.coordinate);
+                    mark.markAsBackground(originNode.coordinate, currentTheme);
                     originNode = null;
                 }
                 if (isDestinationCoordinate(coord)) {
-                    markAsBackground(destinationNode.coordinate);
+                    mark.markAsBackground(destinationNode.coordinate, currentTheme);
                     destinationNode = null;
                 }
 
@@ -1648,8 +1589,8 @@ ocargo.LevelEditor = function() {
         }
 
 
-        applyAlongStrike(deleteNode, strikeEnd);
-        strikeStart = null;
+        ocargo.LevelEditor.State.applyAlongStrike(deleteNode, strikeEnd);
+        ocargo.LEconfig.strikeStart = null;
 
         // Delete any nodes isolated through deletion
         for (var i = nodes.length - 1; i >= 0; i--) {
@@ -1661,7 +1602,8 @@ ocargo.LevelEditor = function() {
     }
 
     function finaliseMove(strikeEnd) {
-        var previousNode = null;
+        var previousNode = null,
+            strikeStart = ocargo.LEconfig.strikeStart;
         function addNode(x, y) {
             var coord = new ocargo.Coordinate(x,y);
             var node = ocargo.Node.findNodeByCoordinate(coord, nodes);
@@ -1677,7 +1619,7 @@ ocargo.LevelEditor = function() {
                 // If we've overwritten the origin node remove it as 
                 // we can no longer place the CFC there
                 if (node === originNode || previousNode == originNode) {
-                    markAsBackground(originNode.coordinate);
+                    mark.markAsBackground(originNode.coordinate, currentTheme);
                     originNode = null;
                 }
             }
@@ -1686,44 +1628,19 @@ ocargo.LevelEditor = function() {
 
 
         if(strikeStart && !(strikeStart.x === strikeEnd.x && strikeStart.y === strikeEnd.y)) {
-            applyAlongStrike(addNode, strikeEnd);
+            ocargo.LevelEditor.State.applyAlongStrike(addNode, strikeEnd);
         }
         strikeStart = null;
-    }
-
-    function applyAlongStrike(func, strikeEnd) {
-        var x, y;
-        if (!strikeStart) {
-            return;
-        }
-
-        if (strikeStart.x <= strikeEnd.x) {
-            for (x = strikeStart.x; x <= strikeEnd.x; x++) {
-                func(x, strikeStart.y);
-            }
-        } else {
-            for (x = strikeStart.x; x >= strikeEnd.x; x--) {
-                func(x, strikeStart.y);
-            }
-        }
-
-        if (strikeStart.y <= strikeEnd.y) {
-            for (y = strikeStart.y + 1; y <= strikeEnd.y; y++) {
-                func(strikeEnd.x, y);
-            }
-        } else {
-            for (y = strikeStart.y - 1; y >= strikeEnd.y; y--) {
-                func(strikeEnd.x, y);
-            }
-        }    
+        ocargo.LEconfig.strikeStart = strikeStart
     }
 
     function setTheme(theme) {
         currentTheme = theme;
+        ocargo.LEconfig.currentTheme = currentTheme;
 
         for (var x = 0; x < GRID_WIDTH; x++) {
             for (var y = 0; y < GRID_HEIGHT; y++) {
-                grid[x][y].attr({stroke: theme.border});
+                ocargo.LEconfig.grid[x][y].attr({stroke: theme.border});
             }
         }
 
