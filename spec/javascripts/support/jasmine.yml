@@ -67,6 +67,7 @@ src_files:
   - "game/static/game/js/node.js"
   - "game/static/game/js/destination.js"
   - "game/static/game/js/pathFinder.js"
+  - "game/static/game/js/level_editor/add_remove_road.js"
 
 # spec_dir
 #
