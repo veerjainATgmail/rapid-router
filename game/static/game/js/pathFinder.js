@@ -1,3 +1,40 @@
+/*
+Code for Life
+
+Copyright (C) 2015, Ocado Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+ADDITIONAL TERMS – Section 7 GNU General Public Licence
+
+This licence does not grant any right, title or interest in any “Ocado” logos,
+trade names or the trademark “Ocado” or any other trademarks or domain names
+owned by Ocado Innovation Limited or the Ocado group of companies or any other
+distinctive brand features of “Ocado” as may be secured from time to time. You
+must not distribute any modification of this program using the trademark
+“Ocado” or claim any affiliation or association with Ocado or its employees.
+
+You are not authorised to use the name Ocado (or any of its trade names) or
+the names of any author or contributor in advertising or for publicity purposes
+pertaining to the distribution of this program, without the prior written
+authorisation of Ocado.
+
+Any propagation, distribution or conveyance of this program must include this
+copyright notice and these terms. You must not misrepresent the origins of this
+program; modified versions of the program must be marked as such and not
+identified as the original program.
+*/
 'use strict';
 
 var ocargo = ocargo || {};
@@ -10,8 +47,13 @@ ocargo.PathFinder = function(model) {
     this.pathScoreDisabled = DISABLE_ROUTE_SCORE;
     this.modelSolution = MODEL_SOLUTION;
 
-    this.maxScoreForPathLength = 10;
-    this.maxScoreForNumberOfInstructions = 10;
+    if (!this.pathScoreDisabled) {
+        this.maxScoreForPathLength = 10;
+    } else {
+        this.maxScoreForPathLength = 0;
+    }
+
+    this.maxScoreForNumberOfInstructions = this.modelSolution.length > 0 ? 10 : 0;
 
     this.maxScore = this.maxScoreForPathLength + this.maxScoreForNumberOfInstructions;
 
@@ -67,6 +109,7 @@ ocargo.PathFinder.prototype.getScore = function() {
             maxScore: this.maxScore,
             performance: performance,
             pathLengthScore: pathLengthScore,
+            pathScoreDisabled: this.pathScoreDisabled,
             maxScoreForPathLength: this.maxScoreForPathLength,
             instrScore: instrScore,
             maxScoreForNumberOfInstructions: this.maxScoreForNumberOfInstructions,
@@ -79,7 +122,7 @@ ocargo.PathFinder.prototype.getNumCoins = function(score, maxScore) {
 };
 
 ocargo.PathFinder.prototype.getTravelledPathScore = function() {
-    var travelled = this.van.travelled;
+    var travelled = this.van.getDistanceTravelled();
     return this.maxScoreForPathLength - (travelled - this.optimalPath.length + 2);
 };
 
@@ -182,7 +225,7 @@ function getOptimalPath(nodes, destinations) {
 
     for (var i = 0; i < destinations.length; i++) {
         destinationNodes.push(destinations[i].node);
-    }
+    };
     permute(destinationNodes);
 
     for (var i = 0; i < permutations.length; i++) {
@@ -198,86 +241,112 @@ function getOptimalPath(nodes, destinations) {
     return bestPermutationPath;
 }
 
+function QueueLink(node, score) {
+  this.node = node;
+  this.score = score;
+  this.next = null;
+};
+
+function PriorityQueue() {
+  var head = null;
+
+  this.push = function(node, score) {
+    if (this.head == null) {
+      this.head = new QueueLink(node, score);
+    } else if (this.head.score > score) {
+      var tmp = this.head;
+      this.head = new QueueLink(node, score);
+      this.head.next = tmp;
+    } else {
+      var i = this.head;
+      var found = false;
+      while (i.next != null && !found) {
+        if (i.next.score > score) {
+          var tmp = i.next;
+          i.next = new QueueLink(node, score);
+          i.next.next = tmp;
+          found = true;
+        }
+        i = i.next;
+      }
+      if (!found) {
+        i.next = new QueueLink(node, score);
+      };
+    }
+  }
+
+  this.pop = function() {
+    if (this.head == null) {
+      return null;
+    } else {
+      var result = this.head.node;
+      this.head = this.head.next;
+      return result;
+    }
+  }
+
+  this.isEmpty = function () {
+    return this.head == null;
+  }
+}
+
 function aStar(origin, destination, nodes) {
 
     var end = destination;          // Nodes already visited.
     var current;
     var start = origin;
-    var closedSet = [];             // The neightbours yet to be evaluated.
-    var openSet = [start];          // All 3 lists are indexed the same way original nodes are.
-    var costFromStart = [0];        // Costs from the starting point.
-    var reversePriority = [0];      // The lower the value, the higher priority of the node.
-    var heuristics = [0];            // Stores results of heuristic().
-    var currentIndex = 0;
-    var neighbourIndex = 0;
+    var closedSet = {};             // The neighbours yet to be evaluated.
+    var openSet = new PriorityQueue();
+    openSet.push(start, 0);
 
     initialiseParents(nodes);
+    closedSet[start.id] = true;
 
-    while (openSet.length > 0) {
-
-        var smallestInOpen = 0;
-        var smallestInReverse = 0;
-        for (var i = 0; i < openSet.lenght; i++) {
-            if (reversePriority[nodes.indexOf(openSet[i])] < reversePriority[smallestInReverse]) {
-                smallestInOpen = i;
-                smallestInReverse = nodes.indexOf(openSet[i]);
-            }
-        }
-        current = openSet[smallestInOpen];
-        currentIndex = nodes.indexOf(current);
+    while (!openSet.isEmpty()) {
+        current = openSet.pop();
 
         // End case.
         if (current === end) {
             return getNodeList(current);
         }
-        openSet.splice(smallestInOpen, 1);
-        closedSet.push(current);
-        var neighbour;
         for (var i = 0; i < current.connectedNodes.length; i++) {
-            neighbour = current.connectedNodes[i];
-            neighbourIndex = nodes.indexOf(neighbour);
-            if (closedSet.indexOf(neighbour) > 0) {
+            var neighbour = current.connectedNodes[i];
+            if (Object.prototype.hasOwnProperty.call(closedSet, neighbour.id)) {
                 continue;
             }
-
-            var gScore = costFromStart[currentIndex] + 1;
-            var gScoreIsBest = false;
-
-            if (openSet.indexOf(current) === -1) {
-                gScoreIsBest = true;
-                heuristics[neighbourIndex] = heuristic(neighbour, end);
-                openSet.push(neighbour);
-            } else if (gScore < costFromStart[neighbourIndex]) {
-                gScoreIsBest = true;
-            }
-
-            if (gScoreIsBest) {
-                neighbour.parent = current;
-                costFromStart[neighbourIndex] = gScore;
-                reversePriority[neighbourIndex] =
-                    costFromStart[neighbourIndex] + heuristics[neighbourIndex];
-            }
+            closedSet[neighbour.id] = true;
+            neighbour.parent = current;
+            var score = distanceFromStart(neighbour) + heuristic(destination, neighbour);
+            openSet.push(neighbour, score);
         }
     }
     // Failed to find a path
     return null;
 
     function heuristic(node1, node2) {
-
         var d1 = Math.abs(node2.coordinate.x - node1.coordinate.x);
         var d2 = Math.abs(node2.coordinate.y - node1.coordinate.y);
         return d1 + d2;
     }
 
     function initialiseParents(nodes) {
-
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].parent = null;
+            nodes[i].id = i;
         }
     }
 
-    function getNodeList(current) {
+    function distanceFromStart(current) {
+      var count = 0;
+      var i = current;
+      while (i.parent != null) {
+        count = count + 1;
+        i = i.parent;
+      }
+      return count;
+    }
 
+    function getNodeList(current) {
         var curr = current;
         var ret = [];
         while (curr !== start && curr !== null) {
@@ -288,4 +357,13 @@ function aStar(origin, destination, nodes) {
         ret.reverse();
         return ret;
     }
+}
+
+function areDestinationsReachable(start, destinations, nodes) {
+  for (var i = 0; i < destinations.length; i++) {
+    if (aStar(start, destinations[i], nodes) == null) {
+      return false;
+    }
+  }
+  return true;
 }
