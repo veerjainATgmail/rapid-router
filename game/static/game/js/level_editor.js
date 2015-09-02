@@ -1601,7 +1601,7 @@ ocargo.LevelEditor = function() {
                 markAsOrigin(originNode.coordinate);
             }
             for (var i = 0; i < destinationNodes.length; i++) {
-                markAsDestination(destinationNode[i].coordinate);
+                markAsDestination(destinationNodes[i].coordinate);
             }
 
             if(trashcanOpen) {
