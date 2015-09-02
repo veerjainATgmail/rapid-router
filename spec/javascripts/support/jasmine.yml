@@ -63,6 +63,8 @@ spec_files:
 # src_dir: public
 #
 src_files:
+  - "http://code.jquery.com/jquery-1.9.1.js"
+  - "game/static/game/js/vendor/jasmine-jquery.js"
   - "game/static/game/js/coordinate.js"
   - "game/static/game/js/node.js"
   - "game/static/game/js/destination.js"
