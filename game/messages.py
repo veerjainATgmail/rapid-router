@@ -1877,3 +1877,45 @@ def description_level109():
 def hint_level109():
     message = ugettext("To halve the value of a variable you can do something like the following:<br /><pre>n /= 2</pre>")
     return message
+
+def title_level110():
+    return ugettext("Beware of Cows")
+
+def description_level110():
+    message = ugettext(
+        "Cows have their own will. They cross roads whenever and wherever they want! Watch out for <b>white</b> cows and find out how to use the new <b>On-Do</b> block to scare them away. The On-Cow-Do block deals with situations that happen more than once and at unknown locations. Place it anywhere on the workspace and choose what to do if a cow appears on the road.")
+    return build_description(title_level110(), message)
+
+def hint_level110():
+    return "Try using <b>On-Do</b> with <b>sound horn</b> or <b>puff up</b> and see which action scares the cow away. Each type of cow only responds to one action. The On-Do block deals with situations that happen more than once and at unknown locations. Place it anywhere and choose what to do if a cow appears on the road. You can choose which cow to look out for on the block."
+
+def title_level111():
+    return ugettext("Watch out, more cows on the road")
+
+def description_level111():
+    message = ugettext("It's the <b>brown</b> cows this time, what can you do to scare them away?")
+    return build_description(title_level111(), message)
+
+def hint_level111():
+    return "Try using <b>On-Do</b> with <b>sound horn</b> or <b>puff up</b> and see which action scares the cow away. Each type of cow only responds to one action. "
+
+def title_level112():
+    return ugettext("How to deal with all these cows? ")
+
+def description_level112():
+    message = ugettext("These cows are getting annoying, aren't they? Let's use the <b>On-Do</b> blocks and scare them all away! There may be more than one type of cow blocking your way. Pay attention to the fuel consumption as different actions use different amount of fuel.")
+    return build_description(title_level112(), message)
+
+
+def hint_level112():
+    return "Remember what you did earlier in the previous levels? Use the <b>On-Do</b> block the same way and scare away the cows. You might need more than one On-Do block to scare away different types of cows."
+
+def title_level113():
+    return ugettext("")
+
+def description_level113():
+    message = ugettext("Well Done! On this map, you may find that the fuel is using up pretty quickly, can you find an alternative solution?")
+    return build_description(title_level113(), message)
+
+def hint_level113():
+    return "Pay attention to how much fuel <b>sound horn</b> and <b>puff up</b> are using, which route requires fewer actions?"
