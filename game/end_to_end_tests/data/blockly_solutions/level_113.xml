@@ -1,0 +1,31 @@
+<xml>
+    <block type="start" id="1" deletable="false" x="40" y="-11">
+        <next>
+            <block type="controls_repeat" id="2">
+                <field name="TIMES">3</field>
+                <statement name="DO">
+                    <block type="turn_left" id="3">
+                        <next>
+                            <block type="controls_repeat" id="4">
+                                <field name="TIMES">4</field>
+                                <statement name="DO">
+                                    <block type="move_forwards" id="5"></block>
+                                </statement>
+                            </block>
+                        </next>
+                    </block>
+                </statement>
+                <next>
+                    <block type="turn_left" id="6"></block>
+                </next>
+            </block>
+        </next>
+    </block>
+    <block type="declare_event" id="7" x="39" y="257">
+        <field name="TYPE">WHITE</field>
+        <field name="IMAGE">/static/game/image/Clarice.svg</field>
+        <statement name="DO">
+            <block type="sound_horn" id="8"></block>
+        </statement>
+    </block>
+</xml>

@@ -123,7 +123,7 @@ def add_levels(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('game', '0049_level_score_34'),
+        ('game', '0050_level_score_40'),
     ]
 
     operations = [

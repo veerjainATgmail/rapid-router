@@ -181,6 +181,21 @@ class TestGame(BaseTest):
     def test_level45(self):
         self.run_level_test(45)
 
+    def test_level110(self):
+        self.run_level_test(110)
+
+    def test_level111(self):
+        self.run_level_test(111)
+
+    def test_level112(self):
+        self.run_level_test(112)
+
+    def test_level112_2(self):
+        self.run_level_test(112, suffix=2)
+
+    def test_level113(self):
+        self.run_level_test(113, route_score=None)
+
     def run_level_test(self, level, suffix=None, route_score="10/10", algorithm_score="10/10"):
         user_profile = self.login_once()
 
