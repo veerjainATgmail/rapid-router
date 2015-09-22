@@ -2440,8 +2440,8 @@ ocargo.LevelEditor = function() {
         var decor = state.decor;
         for (var i = 0; i < decor.length; i++) {
             var decorObject = new InternalDecor(decor[i].decorName);
-            decorObject.setPosition(decor[i].x,
-                                    PAPER_HEIGHT - currentTheme.decor[decor[i].decorName].height - decor[i].y);
+            decorObject.setPosition(decor[i].x + PAPER_PADDING,
+                                    PAPER_HEIGHT - currentTheme.decor[decor[i].decorName].height - decor[i].y + PAPER_PADDING);
         }
 
         // Load in block data
@@ -2789,8 +2789,8 @@ ocargo.LevelEditor = function() {
         this.getData = function() {
             var bBox = this.image.getBBox();
             var data =  {
-                            'x': Math.floor(bBox.x),
-                            'y': PAPER_HEIGHT - bBox.height - Math.floor(bBox.y),
+                            'x': Math.floor(bBox.x) - PAPER_PADDING,
+                            'y': PAPER_HEIGHT - bBox.height - Math.floor(bBox.y) + PAPER_PADDING,
                             'z': currentTheme.decor[this.decorName].z_index,
                             'decorName': this.decorName
                         };
