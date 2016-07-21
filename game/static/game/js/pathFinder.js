@@ -39,6 +39,7 @@ identified as the original program.
 
 var ocargo = ocargo || {};
 
+
 ocargo.PathFinder = function(model) {
     this.van = model.van;
     this.nodes = model.map.nodes;
@@ -46,6 +47,10 @@ ocargo.PathFinder = function(model) {
 
     this.pathScoreDisabled = DISABLE_ROUTE_SCORE;
     this.modelSolution = MODEL_SOLUTION;
+
+    this.optimal_score_boundary = OPTIMAL_SCORE_BOUNDARY;
+    this.pass_score_boundary = PASS_SCORE_BOUNDARY;
+
 
     if (!this.pathScoreDisabled) {
         this.maxScoreForPathLength = 10;
@@ -61,6 +66,7 @@ ocargo.PathFinder = function(model) {
 };
 
 ocargo.PathFinder.prototype.getScore = function() {
+
     var routeCoins = {};
     var instrCoins = {};
     var performance= "";
@@ -73,33 +79,37 @@ ocargo.PathFinder.prototype.getScore = function() {
 
     var totalScore = pathLengthScore;
 
-    if (this.modelSolution.length > 0) {
-        // Then we're on a default level
-        var initInstrScore = this.getScoreForNumberOfInstructions();
-        var instrScore = Math.max(0, initInstrScore);
+    var instrScore = this.getScoreForNumberOfInstructions();
+    instrCoins = this.getNumCoins(instrScore, this.maxScoreForNumberOfInstructions);
+    totalScore += instrScore;
 
-        if (initInstrScore >= 2 * this.maxScoreForNumberOfInstructions) {
-            instrScore = 0;
-        } else if (initInstrScore > this.maxScoreForNumberOfInstructions) {
-            instrScore = this.maxScoreForNumberOfInstructions - initInstrScore % this.maxScoreForNumberOfInstructions;
-        }
-        instrScore = Math.max(0, instrScore);
-
-        totalScore += instrScore;
-        instrCoins = this.getNumCoins(instrScore, this.maxScoreForNumberOfInstructions);
-    }
+    // if (this.modelSolution.length > 0) {
+    //     // Then we're on a default level
+    //     var initInstrScore = this.getScoreForNumberOfInstructions();
+    //     var instrScore = Math.max(0, initInstrScore);
+    //
+    //     if (initInstrScore >= 2 * this.maxScoreForNumberOfInstructions) {
+    //         instrScore = 0;
+    //     } else if (initInstrScore > this.maxScoreForNumberOfInstructions) {
+    //         instrScore = this.maxScoreForNumberOfInstructions - initInstrScore % this.maxScoreForNumberOfInstructions;
+    //     }
+    //     instrScore = Math.max(0, instrScore);
+    //
+    //     totalScore += instrScore;
+    //     instrCoins = this.getNumCoins(instrScore, this.maxScoreForNumberOfInstructions);
+    // }
 
 
     if (pathLengthScore < this.maxScoreForPathLength) {
         performance = "pathLonger";
     }
-    else if (initInstrScore > this.maxScoreForNumberOfInstructions) {
-        performance = "algorithmShorter";
+    else if (instrScore < 6) {
+        performance = "algorithmFail";
     }
-    else if (initInstrScore < this.maxScoreForNumberOfInstructions) {
-        performance = "algorithmLonger";
+    else if (instrScore < 10) {
+        performance = "algorithmPass";
     }
-    else  if (totalScore === this.maxScore) {
+    else  if (totalScore === 10) {
         performance = "scorePerfect";
     }
 
@@ -107,10 +117,10 @@ ocargo.PathFinder.prototype.getScore = function() {
         switch (performance){
             case 'pathLonger':
                 return gettext('Try finding a shorter route to the destination.');
-            case 'algorithmLonger':
-                return gettext('Try creating a simpler program.');
-            case 'algorithmShorter':
+            case 'algorithmFail':
                 return gettext('That solution isn\'t quite right. Read the level instructions or click Help.');
+            case 'algorithmShorter':
+                return gettext('Congratulations! You\'ve passed it! There is a simpler solution though, try to find as a challenge.');
             case 'scorePerfect':
                 return gettext('Congratulations! You\'ve aced it.');
             default:
@@ -141,18 +151,23 @@ ocargo.PathFinder.prototype.getTravelledPathScore = function() {
     return this.maxScoreForPathLength - (travelled - this.optimalPath.length + 2);
 };
 
+
 ocargo.PathFinder.prototype.getScoreForNumberOfInstructions = function() {
 
     var blocksUsed = ocargo.utils.isIOSMode() ? ocargo.game.mobileBlocks : ocargo.blocklyControl.activeBlocksCount();
     var algorithmScore = 0;
-    var difference = this.maxScoreForNumberOfInstructions;
-    for (var i = 0; i < this.modelSolution.length; i++) {
-        var currDifference = blocksUsed - this.modelSolution[i];
-        if (Math.abs(currDifference) < difference) {
-            difference = Math.abs(currDifference);
-            algorithmScore = this.maxScoreForNumberOfInstructions - currDifference;
+
+    if(this.optimal_score_boundary==this.pass_score_boundary){
+        if(blocksUsed==this.optimal_score_boundary){
+            algorithmScore = 10;
         }
     }
+    else{
+        var m = (this.optimal_score_boundary-this.pass_score_boundary)/(10-6);
+        var c = (this.optimal_score_boundary) - m*10;
+        algorithmScore = Math.round((blocksUsed - c)/m);
+    }
+
     return algorithmScore;
 };
 

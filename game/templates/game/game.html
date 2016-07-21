@@ -21,6 +21,8 @@
     var LEVEL_NAME = "{{level.name}}";
     var NEXT_LEVEL_URL = "{% if next_level_url %}{{next_level_url}}{% else %}{% endif %}";
     var MODEL_SOLUTION = {% if model_solution %}{{model_solution}}{% else %}[]{% endif %};
+    var PASS_SCORE_BOUNDARY = {{level.pass_score_boundary}};
+    var OPTIMAL_SCORE_BOUNDARY = {{level.optimal_score_boundary}};
     var DISABLE_ROUTE_SCORE = "{{level.disable_route_score}}" === "True";
     var LESSON = "{{lesson|escapejs}}";
     var HINT = "{{hint}}";
