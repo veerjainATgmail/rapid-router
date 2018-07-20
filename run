@@ -16,7 +16,7 @@ while [ "$1" != "" ]; do
 done
 
 pip install -e .
-pip install git+https://github.com/ocadotechnology/codeforlife-portal.git@pipenv # TODO: Remove once portal is on 1.10
+pip install git+https://github.com/ocadotechnology/codeforlife-portal.git@django_110 # TODO: Remove once portal is on 1.10
 # pip install 'codeforlife-portal >= 1.0.0.post.dev1' # TODO: Remove this requirement (#688)
 ./example_project/manage.py migrate --noinput
 
