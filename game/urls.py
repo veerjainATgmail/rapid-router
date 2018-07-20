@@ -53,7 +53,7 @@ from game.views.level import submit_attempt, play_default_level, start_episode, 
     load_list_of_workspaces, save_workspace, delete_workspace, \
     delete_level, play_custom_level, play_custom_level_from_editor, load_workspace_solution
 from game.views.scoreboard import scoreboard
-urlpatterns = patterns[
+urlpatterns = [
     '',
     url(r'^$', levels, name='levels'),
     url(r'^submit/$', submit_attempt, name='submit_attempt'),
