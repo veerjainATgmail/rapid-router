@@ -27,6 +27,6 @@ setup(name='rapid-router',
         'selenium==3.7.0',
     ],
     test_suite='test_utils.test_suite.DjangoAutoTestSuite',
-    version=versioneer.get_version(),
+    version='1.0.0.post0.dev425',
     zip_safe=False,
 )
