@@ -3418,7 +3418,7 @@ class Migration(migrations.Migration):
                 ('student', models.ForeignKey(blank=True, to='portal.Student', null=True)),
                 ('python_workspace', models.TextField(default=b'')),
                 ('level', models.ForeignKey(related_name=b'attempts', to='game.Level')),
-                ('student', models.ForeignKey(related_name=b'attempts', blank=True, to='portal.Student', null=True))
+                #('student', models.ForeignKey(related_name=b'attempts', blank=True, to='portal.Student', null=True))
                 ],
         ),
         migrations.RunPython(
